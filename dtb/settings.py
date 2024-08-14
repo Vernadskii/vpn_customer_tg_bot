@@ -41,7 +41,6 @@ INSTALLED_APPS = [
 
     # 3rd party apps
     'django_celery_beat',
-    'debug_toolbar',
 
     # local apps
     'users.apps.UsersConfig',
@@ -57,10 +56,15 @@ MIDDLEWARE = [
 
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django.middleware.common.CommonMiddleware',
 ]
+
+
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
 
 INTERNAL_IPS = [
     # ...

@@ -1,7 +1,8 @@
 import datetime
 
 from django.utils import timezone
-from telegram import ParseMode, Update
+from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
 
 from tgbot.handlers.onboarding import static_text
