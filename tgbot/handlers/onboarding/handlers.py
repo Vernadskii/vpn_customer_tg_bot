@@ -6,6 +6,7 @@ from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
 
 from tgbot.handlers.onboarding import static_text
+from tgbot.handlers.onboarding.static_text import REFERRAL, HELP, PRICE, DEPOSIT, MY_BALANCE, MY_VPN, CREATE_VPN
 from tgbot.handlers.utils.info import extract_user_data_from_update
 from users.models import User
 from tgbot.handlers.onboarding.keyboards import make_keyboard_for_start_command
@@ -22,18 +23,22 @@ async def command_start(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text(text=text, reply_markup=make_keyboard_for_start_command())
 
 
-def secret_level(update: Update, context: CallbackContext) -> None:
-    # callback_data: SECRET_LEVEL_BUTTON variable from manage_data.py
-    """ Pressed 'secret_level_button_text' after /start command"""
-    user_id = extract_user_data_from_update(update)['user_id']
-    text = static_text.unlock_secret_room.format(
-        user_count=User.objects.count(),
-        active_24=User.objects.filter(updated_at__gte=timezone.now() - datetime.timedelta(hours=24)).count()
-    )
+async def first_menu_button(update: Update, context: CallbackContext) -> None:
+    query = update.callback_query
+    await query.answer()  # Acknowledge the callback query
 
-    context.bot.edit_message_text(
-        text=text,
-        chat_id=user_id,
-        message_id=update.callback_query.message.message_id,
-        parse_mode=ParseMode.HTML
-    )
+    # Process the callback data and update the message
+    if query.data == CREATE_VPN:
+        await query.edit_message_text(text="You selected Option 1")
+    elif query.data == MY_VPN:
+        await query.edit_message_text(text="You selected Option 2")
+    elif query.data == MY_BALANCE:
+        await query.edit_message_text(text="You selected Option 3")
+    elif query.data == DEPOSIT:
+        await query.edit_message_text(text="You selected Option 4")
+    elif query.data == PRICE:
+        await query.edit_message_text(text="You selected Option 4")
+    elif query.data == HELP:
+        await query.edit_message_text(text="You selected Option 4")
+    elif query.data == REFERRAL:
+        await query.edit_message_text(text="You selected Option 4")

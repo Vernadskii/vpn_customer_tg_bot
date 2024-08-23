@@ -1,13 +1,26 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from tgbot.handlers.onboarding.manage_data import SECRET_LEVEL_BUTTON
-from tgbot.handlers.onboarding.static_text import github_button_text, secret_level_button_text
+from tgbot.handlers.onboarding.static_text import CREATE_VPN, MY_VPN, \
+    MY_BALANCE, DEPOSIT, PRICE, HELP, REFERRAL
 
 
 def make_keyboard_for_start_command() -> InlineKeyboardMarkup:
-    buttons = [[
-        InlineKeyboardButton(github_button_text, url="https://github.com/ohld/django-telegram-bot"),
-        InlineKeyboardButton(secret_level_button_text, callback_data=f'{SECRET_LEVEL_BUTTON}')
-    ]]
+    buttons = [
+        [
+            InlineKeyboardButton(CREATE_VPN, callback_data=CREATE_VPN),
+            InlineKeyboardButton(MY_VPN, callback_data=MY_VPN),
+        ],
+        [
+            InlineKeyboardButton(MY_BALANCE, callback_data=MY_BALANCE),
+            InlineKeyboardButton(DEPOSIT, callback_data=DEPOSIT),
+        ],
+        [
+            InlineKeyboardButton(PRICE, callback_data=PRICE),
+            InlineKeyboardButton(HELP, callback_data=HELP),
+        ],
+        [
+            InlineKeyboardButton(REFERRAL, callback_data=REFERRAL),
+        ]
+    ]
 
     return InlineKeyboardMarkup(buttons)
