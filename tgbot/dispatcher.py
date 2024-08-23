@@ -68,5 +68,5 @@ def setup_handlers(app: Application):
     # ))
 
 
-n_workers = 0 if DEBUG else 4
-dispatcher = setup_handlers(Dispatcher(bot, update_queue=None, workers=n_workers, use_context=True))
+# n_workers = 0 if DEBUG else 4
+# dispatcher = setup_handlers(Dispatcher(bot, update_queue=None, workers=n_workers, use_context=True))
