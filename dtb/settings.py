@@ -103,7 +103,7 @@ ASGI_APPLICATION = 'dtb.asgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, default="sqlite:///db.sqlite3"),
+    'default': dj_database_url.config(conn_max_age=600),
 }
 
 # Password validation
@@ -159,10 +159,7 @@ CELERY_TASK_DEFAULT_QUEUE = 'default'
 # -----> TELEGRAM
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 if TELEGRAM_TOKEN is None:
-    logging.error(
-        "Please provide TELEGRAM_TOKEN in .env file.\n"
-        "Example of .env file: https://github.com/ohld/django-telegram-bot/blob/main/.env_example"
-    )
+    logging.error("Please provide TELEGRAM_TOKEN environment variable.")
     sys.exit(1)
 
 TELEGRAM_LOGS_CHAT_ID = os.getenv("TELEGRAM_LOGS_CHAT_ID", default=None)
