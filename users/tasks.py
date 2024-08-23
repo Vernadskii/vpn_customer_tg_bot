@@ -5,7 +5,7 @@
 import time
 from typing import Union, List, Optional, Dict
 
-import telegram
+from telegram.constants import ParseMode
 
 from dtb.celery import app
 from celery.utils.log import get_task_logger
@@ -22,7 +22,7 @@ def broadcast_message(
     entities: Optional[List[Dict]] = None,
     reply_markup: Optional[List[List[Dict]]] = None,
     sleep_between: float = 0.4,
-    parse_mode=telegram.ParseMode.HTML,
+    parse_mode=ParseMode.HTML,
 ) -> None:
     """ It's used to broadcast message to big amount of users """
     logger.info(f"Going to send message: '{text}' to {len(user_ids)} users")
