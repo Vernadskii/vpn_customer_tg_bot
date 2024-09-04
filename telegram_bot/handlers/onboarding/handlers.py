@@ -6,10 +6,11 @@ from telegram.constants import ParseMode
 from telegram.ext import CallbackContext
 
 from telegram_bot.handlers.onboarding import static_text
-from telegram_bot.handlers.onboarding.static_text import REFERRAL, HELP, PRICE, DEPOSIT, MY_BALANCE, MY_VPN, CREATE_VPN
+from telegram_bot.handlers.onboarding.static_text import REFERRAL, HELP, PRICE, DEPOSIT, MY_BALANCE, MY_VPN, CREATE_VPN, \
+    PRICE_TEXT
 from telegram_bot.handlers.utils.info import extract_user_data_from_update
 from users.models import User
-from telegram_bot.handlers.onboarding.keyboards import make_keyboard_for_start_command
+from telegram_bot.handlers.onboarding.keyboards import make_keyboard_for_start_command, make_keyboard_for_price_command
 
 
 async def command_start(update: Update, context: CallbackContext) -> None:
@@ -37,9 +38,10 @@ async def first_menu_button(update: Update, context: CallbackContext) -> None:
     elif query.data == DEPOSIT:
         await query.edit_message_text(text="You selected Option 4")
     elif query.data == PRICE:
-        await query.edit_message_text()
-        # await query.edit_message_text(text="You selected Option 4")
+        await query.edit_message_text(
+            text=PRICE_TEXT, reply_markup=make_keyboard_for_price_command(), parse_mode=ParseMode.MARKDOWN
+        )
     elif query.data == HELP:
-        await query.edit_message_text(text="You selected Option 4")
+        await query.edit_message_text(text="You selected Option 6")
     elif query.data == REFERRAL:
-        await query.edit_message_text(text="You selected Option 4")
+        await query.edit_message_text(text="You selected Option 7")
