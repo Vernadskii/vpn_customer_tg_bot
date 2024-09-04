@@ -3,9 +3,6 @@ FROM python:3.11-slim-buster
 ENV PYTHONUNBUFFERED=1
 ENV STAGE=${STAGE}
 ENV POETRY_VERSION=1.8.1
-ENV POETRY_HOME=/opt/poetry
-ENV POETRY_VENV=/opt/poetry-venv
-ENV POETRY_CACHE_DIR=/opt/.cache
 
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
     build-essential \
@@ -14,11 +11,7 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN python3 -m venv "$POETRY_VENV" \
-    && "$POETRY_VENV"/bin/pip install -U pip setuptools \
-    && "$POETRY_VENV"/bin/pip install poetry==${POETRY_VERSION} \
-
-ENV PATH="${PATH}:${POETRY_VENV}/bin"
+RUN pip install poetry=="${POETRY_VERSION}"
 
 # Set the working directory to /app
 WORKDIR /app

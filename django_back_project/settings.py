@@ -54,8 +54,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'corsheaders.middleware.CorsMiddleware',
 
     'django.middleware.common.CommonMiddleware',
 ]
@@ -77,7 +77,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-ROOT_URLCONF = 'dtb.urls'
+ROOT_URLCONF = 'django_back_project.urls'
 
 TEMPLATES = [
     {
@@ -95,8 +95,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'dtb.wsgi.application'
-ASGI_APPLICATION = 'dtb.asgi.application'
+WSGI_APPLICATION = 'django_back_project.wsgi.application'
+ASGI_APPLICATION = 'django_back_project.asgi.application'
 
 
 # Database
@@ -142,18 +142,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
-
-
-# -----> CELERY
-REDIS_URL = os.getenv('REDIS_URL', 'redis://redis:6379')
-BROKER_URL = REDIS_URL
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = REDIS_URL
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = TIME_ZONE
-CELERY_TASK_DEFAULT_QUEUE = 'default'
 
 
 # -----> TELEGRAM

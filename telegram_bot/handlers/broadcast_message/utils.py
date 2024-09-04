@@ -3,7 +3,7 @@ from typing import Union, Optional, Dict, List
 import telegram
 from telegram import MessageEntity, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
-from dtb.settings import TELEGRAM_TOKEN
+from django_back_project.settings import TELEGRAM_TOKEN
 from users.models import User
 
 

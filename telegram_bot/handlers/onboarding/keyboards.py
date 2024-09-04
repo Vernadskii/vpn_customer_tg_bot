@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from tgbot.handlers.onboarding.static_text import CREATE_VPN, MY_VPN, \
+from telegram_bot.handlers.onboarding.static_text import CREATE_VPN, MY_VPN, \
     MY_BALANCE, DEPOSIT, PRICE, HELP, REFERRAL
 
 

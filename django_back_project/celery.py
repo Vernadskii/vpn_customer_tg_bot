@@ -2,9 +2,9 @@ import os
 from celery import Celery
 
 # set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dtb.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_back_project.settings')
 
-app = Celery('dtb')
+app = Celery('django_back_project')
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
