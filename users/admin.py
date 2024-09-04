@@ -2,14 +2,14 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from dtb.settings import DEBUG
+from django_back_project.settings import DEBUG
 
 from users.models import Location
 from users.models import User
 from users.forms import BroadcastForm
 
 from users.tasks import broadcast_message
-from tgbot.handlers.broadcast_message.utils import send_one_message
+from telegram_bot.handlers.broadcast_message.utils import send_one_message
 
 
 @admin.register(User)

@@ -4,7 +4,7 @@ from telegram.ext import (
     Application, CommandHandler, MessageHandler, CallbackQueryHandler,
 )
 
-from tgbot.handlers.onboarding import handlers as onboarding_handlers
+from telegram_bot.handlers.onboarding import handlers as onboarding_handlers
 
 
 def setup_handlers(app: Application):

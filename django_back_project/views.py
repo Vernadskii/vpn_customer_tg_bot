@@ -1,25 +1,25 @@
 import json
 import logging
 from django.views import View
-from django.http import JsonResponse
-from telegram import Update
+from django.http import JsonResponse, HttpResponseRedirect
+# from telegram import Update
 
-from dtb.celery import app
-from dtb.settings import DEBUG
-from tgbot.dispatcher import dispatcher
-from tgbot.main import bot
+# from django_back_project.celery import app
+from django_back_project.settings import DEBUG
+# from telegram_bot.dispatcher import dispatcher
+# from telegram_bot.main import bot
 
 logger = logging.getLogger(__name__)
 
 
-@app.task(ignore_result=True)
-def process_telegram_event(update_json):
-    update = Update.de_json(update_json, bot)
-    dispatcher.process_update(update)
+# @app.task(ignore_result=True)
+# def process_telegram_event(update_json):
+#     update = Update.de_json(update_json, bot)
+#     dispatcher.process_update(update)
 
 
 def index(request):
-    return JsonResponse({"error": "sup hacker"})
+    return HttpResponseRedirect('/tgadmin/')
 
 
 class TelegramBotWebhookView(View):
