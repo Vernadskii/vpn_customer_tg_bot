@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
     # local apps
     'django_apps.users.apps.UsersConfig',
+    'django_apps.vpn_config.apps.VpnConfigConfig',
 ]
 
 MIDDLEWARE = [

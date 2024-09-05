@@ -8,7 +8,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 
 from telegram_bot.handlers.utils.info import extract_user_data_from_update
-from utils.models import CreateUpdateTracker
+from django_apps.utils.models import CreateUpdateTracker
 
 
 class AdminUserManager(Manager):
