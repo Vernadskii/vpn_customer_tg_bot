@@ -1,5 +1,5 @@
-start_created = "Hi {first_name}, nice to meet you!"
-start_not_created = "Welcome back, {first_name}!"
+START_CREATED = "Hi {first_name}, nice to meet you!"
+START_OLD_USER = "Welcome back, {first_name}!"
 
 CREATE_VPN = "Create VPN"
 MY_VPN = "My VPN"
@@ -8,7 +8,20 @@ DEPOSIT = "Deposit"
 PRICE = "Price"
 HELP = "Help"
 REFERRAL = "Referral"
+MAIN_MENU = "Main menu"
 
-MAIN_MENU = "Main Menu"
+BUTTONS = [CREATE_VPN, MY_VPN, MY_BALANCE, DEPOSIT, PRICE, HELP, REFERRAL, MAIN_MENU]
 
-PRICE_TEXT = "Price Text"
+CALLBACK_PATTERN = "^START*"
+CALLBACK_FORM = "START. {}"
+
+ONBOARDING_BUTTONS_QUERY = {
+    CREATE_VPN: CALLBACK_FORM.format(CREATE_VPN),
+    MY_VPN: CALLBACK_FORM.format(MY_VPN),
+    MY_BALANCE: CALLBACK_FORM.format(MY_BALANCE),
+    DEPOSIT: CALLBACK_FORM.format(DEPOSIT),
+    PRICE: CALLBACK_FORM.format(PRICE),
+    HELP: CALLBACK_FORM.format(HELP),
+    REFERRAL: CALLBACK_FORM.format(REFERRAL),
+    MAIN_MENU: CALLBACK_FORM.format(MAIN_MENU),
+}

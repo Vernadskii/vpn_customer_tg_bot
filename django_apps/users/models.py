@@ -3,12 +3,12 @@ from __future__ import annotations
 from typing import Union, Optional, Tuple
 
 from django.db import models
-from django.db.models import QuerySet, Manager
+from django.db.models import Manager
 from telegram import Update
 from telegram.ext import CallbackContext
 
 from telegram_bot.handlers.utils.info import extract_user_data_from_update
-from utils.models import CreateUpdateTracker, nb, CreateTracker, GetOrNoneManager
+from utils.models import CreateUpdateTracker
 
 
 class AdminUserManager(Manager):
@@ -17,18 +17,19 @@ class AdminUserManager(Manager):
 
 
 class User(CreateUpdateTracker):
-    user_id = models.PositiveBigIntegerField(primary_key=True)  # telegram_id
-    username = models.CharField(max_length=32, **nb)
-    first_name = models.CharField(max_length=256)
-    last_name = models.CharField(max_length=256, **nb)
-    language_code = models.CharField(max_length=8, help_text="Telegram client's lang", **nb)
-    deep_link = models.CharField(max_length=64, **nb)
-
-    is_blocked_bot = models.BooleanField(default=False)
-
+    user_id = models.PositiveBigIntegerField(primary_key=True, help_text="User's telegram ID")
+    username = models.TextField(max_length=50, blank=True, null=True)
+    chat_id = models.IntegerField(
+        blank=True, null=True, help_text='Unique identifier for the chat with the user', unique=True,
+    )
+    date_joined = models.DateTimeField(auto_now_add=True)
+    last_seen = models.DateTimeField(blank=True, null=True)
+    last_activity = models.DateTimeField(
+        blank=True, null=True, help_text='Date and time of the user\'s last activity in the bot',
+    )
+    is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
-    objects = GetOrNoneManager()  # user = User.objects.get_or_none(user_id=<some_id>)
     admins = AdminUserManager()  # User.admins.all()
 
     def __str__(self):
@@ -51,35 +52,9 @@ class User(CreateUpdateTracker):
         return u, created
 
     @classmethod
-    def get_user(cls, update: Update, context: CallbackContext) -> User:
-        u, _ = cls.get_user_and_created(update, context)
-        return u
-
-    @classmethod
     def get_user_by_username_or_user_id(cls, username_or_user_id: Union[str, int]) -> Optional[User]:
-        """ Search user in DB, return User or None if not found """
+        """Search user in DB, return User or None if not found."""
         username = str(username_or_user_id).replace("@", "").strip().lower()
         if username.isdigit():  # user_id
             return cls.objects.filter(user_id=int(username)).first()
         return cls.objects.filter(username__iexact=username).first()
-
-    @property
-    def invited_users(self) -> QuerySet[User]:
-        return User.objects.filter(deep_link=str(self.user_id), created_at__gt=self.created_at)
-
-    @property
-    def tg_str(self) -> str:
-        if self.username:
-            return f'@{self.username}'
-        return f"{self.first_name} {self.last_name}" if self.last_name else f"{self.first_name}"
-
-
-class Location(CreateTracker):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-
-    objects = GetOrNoneManager()
-
-    def __str__(self):
-        return f"user: {self.user}, created at {self.created_at.strftime('(%H:%M, %d %B %Y)')}"

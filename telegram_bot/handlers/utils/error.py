@@ -7,7 +7,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 
 from django_back_project.settings import TELEGRAM_LOGS_CHAT_ID
-from users.models import User
+from django_apps.users.models import User
 
 
 def send_stacktrace_to_tg_chat(update: Update, context: CallbackContext) -> None:

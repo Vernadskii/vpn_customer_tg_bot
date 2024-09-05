@@ -4,7 +4,7 @@ import telegram
 from telegram import MessageEntity, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from django_back_project.settings import TELEGRAM_TOKEN
-from users.models import User
+from django_apps.users.models import User
 
 
 def from_celery_markup_to_markup(celery_markup: Optional[List[List[Dict]]]) -> Optional[InlineKeyboardMarkup]:

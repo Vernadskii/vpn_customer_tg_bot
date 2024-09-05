@@ -8,7 +8,7 @@ from telegram.ext import CallbackContext
 from telegram_bot.handlers.admin import static_text
 from telegram_bot.handlers.admin.utils import _get_csv_from_qs_values
 from telegram_bot.handlers.utils.decorators import admin_only, send_typing_action
-from users.models import User
+from django_apps.users.models import User
 
 
 @admin_only

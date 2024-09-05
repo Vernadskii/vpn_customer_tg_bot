@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.constants import ChatAction
 from telegram.ext import CallbackContext
 
-from users.models import User
+from django_apps.users.models import User
 
 
 def admin_only(func: Callable):

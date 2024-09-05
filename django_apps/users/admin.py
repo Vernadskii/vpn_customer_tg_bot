@@ -4,11 +4,10 @@ from django.shortcuts import render
 
 from django_back_project.settings import DEBUG
 
-from users.models import Location
-from users.models import User
-from users.forms import BroadcastForm
+from django_apps.users.models import User
+from django_apps.users.forms import BroadcastForm
 
-from users.tasks import broadcast_message
+from django_apps.users.tasks import broadcast_message
 from telegram_bot.handlers.broadcast_message.utils import send_one_message
 
 
@@ -45,10 +44,6 @@ class UserAdmin(admin.ModelAdmin):
         else:
             form = BroadcastForm(initial={'_selected_action': user_ids})
             return render(
-                request, "admin/broadcast_message.html", {'form': form, 'title': u'Broadcast message'}
+                request, "admin/templates/admin/broadcast_message.html", {'form': form, 'title': u'Broadcast message'}
             )
 
-
-@admin.register(Location)
-class LocationAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user_id', 'created_at']
