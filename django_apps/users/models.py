@@ -22,8 +22,6 @@ class User(CreateUpdateTracker):
     chat_id = models.IntegerField(
         blank=True, null=True, help_text='Unique identifier for the chat with the user', unique=True,
     )
-    date_joined = models.DateTimeField(auto_now_add=True)
-    last_seen = models.DateTimeField(blank=True, null=True)
     last_activity = models.DateTimeField(
         blank=True, null=True, help_text='Date and time of the user\'s last activity in the bot',
     )
