@@ -13,9 +13,9 @@ from telegram_bot.handlers.broadcast_message.utils import send_one_message
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['user_id', 'username', 'created_at', 'updated_at']
+    list_display = ['id', 'username', 'created_at', 'updated_at']
     list_filter = ["updated_at", ]
-    search_fields = ('username', 'user_id')
+    search_fields = ('username', 'id')
 
     actions = ['broadcast']
 

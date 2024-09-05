@@ -17,15 +17,10 @@ class AdminUserManager(Manager):
 
 
 class User(CreateUpdateTracker):
-    user_id = models.PositiveBigIntegerField(primary_key=True, help_text="User's telegram ID")
     username = models.TextField(max_length=50, blank=True, null=True)
     chat_id = models.IntegerField(
         blank=True, null=True, help_text='Unique identifier for the chat with the user', unique=True,
     )
-    last_activity = models.DateTimeField(
-        blank=True, null=True, help_text='Date and time of the user\'s last activity in the bot',
-    )
-    is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
     admins = AdminUserManager()  # User.admins.all()
@@ -37,16 +32,11 @@ class User(CreateUpdateTracker):
     @classmethod
     async def get_user_and_created(cls, update: Update, context: CallbackContext) -> Tuple[User, bool]:
         """ python-telegram-bot's Update, Context --> User instance """
-        data = extract_user_data_from_update(update)
-        u, created = await cls.objects.aupdate_or_create(user_id=data["user_id"], defaults=data)
-
-        if created:
-            # Save deep_link to User model
-            if context is not None and context.args is not None and len(context.args) > 0:
-                payload = context.args[0]
-                if str(payload).strip() != str(data["user_id"]).strip():  # you can't invite yourself
-                    u.deep_link = payload
-                    u.save()
+        user_dict_data = update.effective_user.to_dict()
+        u, created = await cls.objects.aget_or_create(
+            chat_id=user_dict_data["id"],
+            username=user_dict_data['username']
+        )
 
         return u, created
 

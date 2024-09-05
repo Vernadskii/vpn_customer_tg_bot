@@ -14,9 +14,9 @@ async def command_start(update: Update, context: CallbackContext) -> None:
     u, created = await User.get_user_and_created(update, context)
 
     if created:
-        text = static_text.START_CREATED.format(first_name=u.first_name)
+        text = static_text.START_CREATED.format(first_name=u.username)
     else:
-        text = static_text.START_OLD_USER.format(first_name=u.first_name)
+        text = static_text.START_OLD_USER.format(first_name=u.username)
 
     await update.message.reply_text(text=text, reply_markup=make_keyboard_for_start_command())
 
