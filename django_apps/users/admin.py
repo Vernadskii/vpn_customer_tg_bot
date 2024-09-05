@@ -13,12 +13,8 @@ from telegram_bot.handlers.broadcast_message.utils import send_one_message
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = [
-        'user_id', 'username', 'first_name', 'last_name', 
-        'language_code', 'deep_link',
-        'created_at', 'updated_at', "is_blocked_bot",
-    ]
-    list_filter = ["is_blocked_bot", ]
+    list_display = ['user_id', 'username', 'created_at', 'updated_at']
+    list_filter = ["updated_at", ]
     search_fields = ('username', 'user_id')
 
     actions = ['broadcast']

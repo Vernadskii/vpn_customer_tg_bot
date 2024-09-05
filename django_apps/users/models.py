@@ -31,6 +31,7 @@ class User(CreateUpdateTracker):
     is_admin = models.BooleanField(default=False)
 
     admins = AdminUserManager()  # User.admins.all()
+    objects = models.Manager()
 
     def __str__(self):
         return f'@{self.username}' if self.username is not None else f'{self.user_id}'
