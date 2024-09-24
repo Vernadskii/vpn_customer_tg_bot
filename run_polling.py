@@ -22,11 +22,9 @@ async def run_polling(tg_token: str = TELEGRAM_TOKEN):
     print("Bot is running in polling mode...")
 
     try:
-        # Wait indefinitely until manually stopped
-        await asyncio.Event().wait()
+        await asyncio.Event().wait()  # Wait indefinitely until manually stopped
     except asyncio.CancelledError:
-        # Handle the cancellation gracefully
-        print("Bot is shutting down...")
+        print("Bot is shutting down...")  # Handle the cancellation gracefully
     finally:
         # Ensure the bot is stopped gracefully
         await application.stop()
