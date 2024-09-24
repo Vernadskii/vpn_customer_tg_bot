@@ -145,10 +145,16 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 
+VPN_SERVICE_URL = os.getenv("VPN_SERVICE_URL")
+if VPN_SERVICE_URL is None:
+    logging.error("Please, provide VPN_SERVICE_URL environment variable.")
+    sys.exit(1)
+
+
 # -----> TELEGRAM
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 if TELEGRAM_TOKEN is None:
-    logging.error("Please provide TELEGRAM_TOKEN environment variable.")
+    logging.error("Please, provide TELEGRAM_TOKEN environment variable.")
     sys.exit(1)
 
 TELEGRAM_LOGS_CHAT_ID = os.getenv("TELEGRAM_LOGS_CHAT_ID", default=None)
