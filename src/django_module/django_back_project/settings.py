@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'django_celery_beat',
 
     # local apps
-    'django_apps.users.apps.UsersConfig',
-    'django_apps.vpn_config.apps.VpnConfigConfig',
+    'django_module.apps.users.apps.UsersConfig',
+    #'django_module.apps.VpnConfigConfig',
 ]
 
 MIDDLEWARE = [

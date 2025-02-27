@@ -2,12 +2,12 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from django_back_project.settings import DEBUG
+from django_module.django_back_project.settings import DEBUG
 
-from django_apps.users.models import User
-from django_apps.users.forms import BroadcastForm
+from django_module.apps.users.models import User
+from django_module.apps.users.forms import BroadcastForm
 
-from django_apps.users.tasks import broadcast_message
+from django_module.apps.users.tasks import broadcast_message
 from telegram_bot.handlers.broadcast_message.utils import send_one_message
 
 

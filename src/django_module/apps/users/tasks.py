@@ -7,7 +7,7 @@ from typing import Union, List, Optional, Dict
 
 from telegram.constants import ParseMode
 
-from django_back_project.celery import app
+from django_module.django_back_project.celery import app
 from celery.utils.log import get_task_logger
 from telegram_bot.handlers.broadcast_message.utils import send_one_message, from_celery_entities_to_entities, \
     from_celery_markup_to_markup

@@ -7,7 +7,8 @@ from django.db.models import Manager
 from telegram import Update
 from telegram.ext import CallbackContext
 
-from django_apps.utils.models import CreateUpdateTracker
+from django_module.apps.utils.models import CreateUpdateTracker
+
 
 
 class AdminUserManager(Manager):

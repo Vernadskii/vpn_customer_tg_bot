@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class UsersConfig(AppConfig):
-    name = 'django_apps.users'
+    name = 'django_module.apps.users'

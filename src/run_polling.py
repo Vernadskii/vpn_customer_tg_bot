@@ -1,13 +1,13 @@
 import asyncio
 import os, django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_back_project.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_module.django_back_project.settings')
 django.setup()
 
 from telegram.ext import Application
 from telegram import Update
 
-from django_back_project.settings import TELEGRAM_TOKEN
+from django_module.django_back_project.settings import TELEGRAM_TOKEN
 from telegram_bot.dispatcher import setup_handlers
 
 
