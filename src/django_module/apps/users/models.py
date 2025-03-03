@@ -10,7 +10,6 @@ from telegram.ext import CallbackContext
 from django_module.apps.utils.models import CreateUpdateTracker
 
 
-
 class AdminUserManager(Manager):
     def get_queryset(self):
         return super().get_queryset().filter(is_admin=True)
@@ -27,7 +26,7 @@ class User(CreateUpdateTracker):
     objects = models.Manager()
 
     def __str__(self):
-        return f'@{self.username}' if self.username is not None else f'{self.user_id}'
+        return f'username: @{self.username}' if self.username is not None else f'id: {self.id}'
 
     @classmethod
     async def get_user_and_created(cls, update: Update, context: CallbackContext) -> Tuple[User, bool]:

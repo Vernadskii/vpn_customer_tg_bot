@@ -16,11 +16,11 @@ class Migration(migrations.Migration):
             name='User',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
                 ('username', models.TextField(blank=True, max_length=50, null=True)),
                 ('chat_id', models.IntegerField(blank=True, help_text='Unique identifier for the chat with the user', null=True, unique=True)),
                 ('is_admin', models.BooleanField(default=False)),
+                ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
             ],
             options={
                 'ordering': ('-created_at',),
