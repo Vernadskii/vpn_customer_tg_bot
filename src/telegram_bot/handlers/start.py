@@ -1,67 +1,81 @@
-from telegram import Update, ReplyKeyboardMarkup
-from telegram.ext import ConversationHandler, CommandHandler, ContextTypes, MessageHandler, filters, CallbackContext
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import ConversationHandler, CommandHandler, ContextTypes, CallbackContext, \
+    CallbackQueryHandler
 
 from django_module.apps.users.models import User
 from telegram_bot.handlers import static_text
-from telegram_bot.handlers.account import handle_top_up_balance, handle_buy_subscription, handle_my_subscription
+from telegram_bot.handlers.account import handle_account_selection
+from telegram_bot.handlers.info import handle_info_selection
 
-CHOOSING_START, CHOOSING_LK = range(2)
+
+CHOOSING_START, CHOOSING_ACCOUNT, CHOOSING_INFO = range(3)
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    reply_keyboard = [["Личный кабинет", "Инфо"]]
+    keyboard = [
+        [InlineKeyboardButton(static_text.PERSONAL_ACCOUNT_BUTTON, callback_data=static_text.PERSONAL_ACCOUNT_CALLBACK)],
+        [InlineKeyboardButton(static_text.INFO_BUTTON, callback_data=static_text.INFO_CALLBACK)]
+    ]
+
     u, created = await User.get_user_and_created(update, context)
 
     text = static_text.START_CREATED.format(first_name=u.username) if created \
         else static_text.START_OLD_USER.format(first_name=u.username)
 
     await update.message.reply_text(
-        text=text, reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, one_time_keyboard=True,
-        ),
+        text=text,
+        reply_markup=InlineKeyboardMarkup(keyboard),
     )
 
     return CHOOSING_START
 
 
 async def handle_start_selection(update: Update, context: CallbackContext) -> int:
-    # Check user choice and navigate to the appropriate state
-    choice = update.message.text
-    if choice == 'Личный кабинет':
-        return await handle_lk(update, context)
-    if choice == 'Инфо':
+    query = update.callback_query
+    await query.answer()  # Подтверждаем получку, чтобы избежать "зависания" у пользователя
+    choice = query.data
+
+    if choice == "personal_account":
+        return await handle_account(update, context)
+    elif choice == "info":
         return await handle_info(update, context)
-    return await invalid_input(update, context)
 
 
-async def handle_account_selection(update: Update, context: CallbackContext) -> int:
-    choice = update.message.text
-    if choice == 'Пополнить баланс':
-        return await handle_top_up_balance(update, context)
-    if choice == 'Приобрести ВПН':
-        return await handle_buy_subscription(update, context)
-    if choice == 'Мои подписки':
-        return await handle_my_subscription(update, context)
-    return await invalid_input(update, context)
+async def handle_account(update: Update, context: CallbackContext) -> int:
+    keyboard = [
+        [
+            InlineKeyboardButton(static_text.TOP_UP_ACCOUNT_BUTTON, callback_data=static_text.TOP_UP_ACCOUNT_CALLBACK),
+            InlineKeyboardButton(static_text.BUY_VPN_BUTTON, callback_data=static_text.BUY_VPN_CALLBACK)
+        ],
+        [
+            InlineKeyboardButton(static_text.MY_SUBSCRIPTIONS_BUTTON, callback_data=static_text.MY_SUBSCRIPTIONS_CALLBACK)
+        ]
+    ]
 
-
-# Handler for "Личный кабинет"
-async def handle_lk(update: Update, context: CallbackContext) -> int:
-    # Здесь добавьте логику для личного кабинета
-    reply_keyboard = [["Пополнить баланс", "Приобрести ВПН", "Мои подписки"]]
-    await update.message.reply_text(
-        text="Баланс: х\n"
-             "Дата окончания подписки: DD-MM-YYYY",
-        reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True),
+    await update.callback_query.message.reply_text(
+        text="Баланс: х\nДата окончания подписки: DD-MM-YYYY",
+        reply_markup=InlineKeyboardMarkup(keyboard),
     )
-    return CHOOSING_LK
+    return CHOOSING_ACCOUNT
 
 
-# Handler for "Инфо"
 async def handle_info(update: Update, context: CallbackContext) -> int:
-    # Здесь добавьте логику для информации
-    await update.message.reply_text("Вы выбрали Инфо.")
-    return ConversationHandler.END
+    keyboard = [
+        [
+            InlineKeyboardButton(static_text.ABOUT_US_BUTTON, callback_data=static_text.ABOUT_US_CALLBACK),
+            InlineKeyboardButton(static_text.PRICING_BUTTON, callback_data=static_text.PRICING_CALLBACK),
+        ],
+        [
+            InlineKeyboardButton(static_text.HOW_TO_USE_BUTTON, callback_data=static_text.HOW_TO_USE_CALLBACK),
+            InlineKeyboardButton(static_text.SUPPORT_BUTTON, callback_data=static_text.SUPPORT_CALLBACK),
+        ]
+    ]
+
+    await update.callback_query.message.reply_text(
+        text="Выберите раздел:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+    return CHOOSING_INFO
 
 
 async def invalid_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -72,12 +86,12 @@ async def invalid_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 start_handler = ConversationHandler(
     entry_points=[CommandHandler("start", start_command)],
     states={
-        CHOOSING_START: [
-            MessageHandler(filters.Regex("^(Личный кабинет|Инфо)$"), handle_start_selection),
-        ],
-        CHOOSING_LK: [
-            MessageHandler(filters.Regex("^(Пополнить баланс|Приобрести ВПН|Мои подписки)$"), handle_account_selection),
-        ]
+        CHOOSING_START: [CallbackQueryHandler(handle_start_selection)],
+        CHOOSING_ACCOUNT: [CallbackQueryHandler(handle_account_selection)],
+        CHOOSING_INFO: [CallbackQueryHandler(handle_info_selection)]
     },
-    fallbacks=[CommandHandler("cancel", invalid_input)],
+    fallbacks=[
+        CommandHandler("start", start_command),  # Обработка команды /start в fallback
+        CommandHandler("cancel", invalid_input),
+    ],
 )
