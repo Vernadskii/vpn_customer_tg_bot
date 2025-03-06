@@ -1,3 +1,5 @@
+# Вынесена в отдельный файл, чтобы избежать проблем с цикличным импортом.
+# start_command используется в start.py, info.py, account.py.
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import ContextTypes
 
