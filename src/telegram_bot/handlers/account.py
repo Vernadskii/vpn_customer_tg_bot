@@ -1,7 +1,6 @@
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ConversationHandler, CommandHandler, ContextTypes, MessageHandler, filters, CallbackContext
 
-from django_module.apps.users.models import User
 from telegram_bot.handlers import static_text
 
 

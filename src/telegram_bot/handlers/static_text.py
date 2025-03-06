@@ -1,4 +1,14 @@
 # start.py
+CHOOSING_START, CHOOSING_ACCOUNT, CHOOSING_INFO = range(3)
+ABOUT_US, PRICE, HOW_TO_USE, SUPPORT, BACK_TO_INFO = range(100, 105)
+STOPPING = range(400, 401)
+
+START_OVER = "START_FLAG"
+BACK = "Назад"
+BACK_CALLBACK = "BACK_CALLBACK"
+BACK_INFO_CALLBACK = "BACK_INFO_CALLBACK"
+STOP_TEXT = "Диалог сброшен\nЧтобы начать заново введите команду /start"
+
 START_CREATED = "Привет {first_name}, рад видеть тебя!"
 START_OLD_USER = "Добро пожаловать снова, {first_name}!"
 
