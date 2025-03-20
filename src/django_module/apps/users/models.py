@@ -17,7 +17,7 @@ class AdminUserManager(Manager):
 
 class User(CreateUpdateTracker):
     username = models.TextField(max_length=50, blank=True, null=True)
-    chat_id = models.IntegerField(
+    chat_id = models.BigIntegerField(
         blank=True, null=True, help_text='Unique identifier for the chat with the user', unique=True,
     )
     is_admin = models.BooleanField(default=False)

@@ -78,7 +78,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-ROOT_URLCONF = 'django_back_project.urls'
+ROOT_URLCONF = 'django_module.django_back_project.urls'
 
 TEMPLATES = [
     {
@@ -96,8 +96,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'django_back_project.wsgi.application'
-ASGI_APPLICATION = 'django_back_project.asgi.application'
+WSGI_APPLICATION = 'django_module.django_back_project.wsgi.application'
+ASGI_APPLICATION = 'django_module.django_back_project.asgi.application'
 
 
 # Database

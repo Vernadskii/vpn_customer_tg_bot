@@ -5,7 +5,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 # from telegram import Update
 
 # from django_back_project.celery import app
-from django_back_project.settings import DEBUG
+# from django_back_project.settings import DEBUG
 # from telegram_bot.dispatcher import dispatcher
 # from telegram_bot.main import bot
 
@@ -26,13 +26,13 @@ class TelegramBotWebhookView(View):
     # WARNING: if fail - Telegram webhook will be delivered again.
     # Can be fixed with async celery task execution
     def post(self, request, *args, **kwargs):
-        if DEBUG:
-            process_telegram_event(json.loads(request.body))
-        else:
-            # Process Telegram event in Celery worker (async)
-            # Don't forget to run it and & Redis (message broker for Celery)!
-            # Locally, You can run all of these services via docker-compose.yml
-            process_telegram_event.delay(json.loads(request.body))
+        # if DEBUG:
+        #     process_telegram_event(json.loads(request.body))
+        # else:
+        #     # Process Telegram event in Celery worker (async)
+        #     # Don't forget to run it and & Redis (message broker for Celery)!
+        #     # Locally, You can run all of these services via docker-compose.yml
+        #     process_telegram_event.delay(json.loads(request.body))
 
         # e.g. remove buttons, typing event
         return JsonResponse({"ok": "POST request processed"})
