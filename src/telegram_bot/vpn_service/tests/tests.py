@@ -2,7 +2,7 @@ import os
 import tempfile
 
 import pytest
-from telegram_bot.vpn_service.api_models import WgConfigModel
+from telegram_bot.vpn_service.api_models import AWgConfigModel
 from telegram_bot.vpn_service.tests.test_data import test_config
 from telegram_bot.vpn_service.utils import create_config_file_async
 
@@ -16,14 +16,14 @@ def temp_file():
 
 
 def test_creation_wg_config_model_instance():
-    config = WgConfigModel(**test_config['example'])
+    config = AWgConfigModel(**test_config['example'])
     print(config)
 
 
 @pytest.mark.asyncio
 async def test_creation_wg_config_file(temp_file):
     assert os.path.exists(temp_file)
-    config = WgConfigModel(**test_config['example'])
+    config = AWgConfigModel(**test_config['example'])
     await create_config_file_async(temp_file, config)
 
     # checking file:

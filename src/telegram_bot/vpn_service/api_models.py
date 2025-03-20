@@ -2,20 +2,30 @@ from pydantic import BaseModel, constr, ConfigDict
 from typing import List
 
 
-class Interface(BaseModel):
+class AWGInterface(BaseModel):
     PrivateKey: constr(min_length=44, max_length=44)  # WireGuard keys are base64-encoded and 44 characters long
     Address: str  # It could be more specific
+    H1: int
+    H2: int
+    H3: int
+    H4: int
+    Jc: int
+    Jmax: int
+    Jmin: int
+    S1: int
+    S2: int
 
 
 class Peer(BaseModel):
     PublicKey: constr(min_length=44, max_length=44)  # Same as the private key
     AllowedIPs: List[str]  # You can add custom validation if you want stricter control over CIDR
     Endpoint: str  # It's a combination of an IP and a port, so a stricter format could be added via validation
-    PersistentKeepalive: int
+    PersistentKeepalive: int | None = None
 
 
-class WgConfigModel(BaseModel):
-    Interface: Interface
+class AWgConfigModel(BaseModel):
+    config_id: int
+    Interface: AWGInterface
     Peer: Peer
 
     model_config = ConfigDict(
@@ -23,8 +33,17 @@ class WgConfigModel(BaseModel):
         json_schema_extra={
             "example": {
                 "Interface": {
+                    "Address": "10.0.0.7/32",
+                    "H1": 1227045251,
+                    "H2": 1227045252,
+                    "H3": 1227045253,
+                    "H4": 1227045254,
+                    "Jc": 10,
+                    "Jmax": 30,
+                    "Jmin": 20,
                     "PrivateKey": "IPSgpX3YmAsARgs1Fd5KGEoFZzfj3nQ0SMHiG9zHXEE=",
-                    "Address": "10.0.0.7/32"
+                    "S1": 100,
+                    "S2": 110
                 },
                 "Peer": {
                     "PublicKey": "uMnvozNSuNG6pRbzL7jViHTECIhEzsD/GxMSvY5lBzM=",

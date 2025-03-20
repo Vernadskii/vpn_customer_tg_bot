@@ -1,13 +1,13 @@
 import aiofiles
 
-from telegram_bot.vpn_service.api_models import WgConfigModel
+from telegram_bot.vpn_service.api_models import AWgConfigModel
 
 # # Configure logging
 # logging.basicConfig(level=logging.DEBUG)
 # logger = logging.getLogger(__name__)
 
 
-async def create_config_file_async(file_path: str, config: WgConfigModel) -> None:
+async def create_config_file_async(file_path: str, config: AWgConfigModel) -> None:
     """Asynchronously create a config file and write content to it."""
     interface_str = (
         "[Interface]\n"
