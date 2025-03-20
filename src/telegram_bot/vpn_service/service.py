@@ -1,13 +1,15 @@
+import hashlib
 import logging
+from pathlib import Path
 from typing import Literal
 
+import aiofiles
 import aiohttp
 from aiohttp import ClientTimeout, ClientError, ClientResponseError
 from pydantic import ValidationError
 
 from django_module.django_back_project import settings
 from telegram_bot.vpn_service.api_models import AWgConfigModel
-from telegram_bot.vpn_service.tests.test_data import test_config
 
 # # Configure logging
 # logging.basicConfig(level=logging.DEBUG)
@@ -17,6 +19,12 @@ from telegram_bot.vpn_service.tests.test_data import test_config
 class ConfigCreateError(Exception):
     """Custom exception for configuration fetch errors."""
     pass
+
+
+def hash_id(_id: int) -> str:
+    """Хешируем строку с использованием SHA256."""
+    hash_object = hashlib.sha256(str(_id).encode())  # Преобразуем строку в байты
+    return hash_object.hexdigest()  # Возвращаем хеш как строку
 
 
 class VPNService:
@@ -38,6 +46,7 @@ class VPNService:
             self._session = None
 
     async def create_config(self):
+        """Send a request to vnp-service for creating new config."""
         create_url = f"/api/{self.api_version}/config"
         payload = {'proto': self._config_type}  # sets protocol type
         try:
@@ -51,7 +60,12 @@ class VPNService:
                     # raise ConfigCreateError(f"Error creating a new config: {response.status}, {data}")
                     return None
 
-                return AWgConfigModel(**data)
+                try:
+                    return AWgConfigModel(**data)
+                except ValidationError as ve:
+                    print(f"Validation error: {ve.errors()}")  # TODO: add logging
+                    return None
+
         except ClientTimeout:
             print(f"Timeout occurred while trying to reach {create_url}")
         except (ClientError, ClientResponseError) as e:
@@ -67,25 +81,36 @@ class VPNService:
     def activate_config(self):
         pass
 
+    @staticmethod
+    async def create_file_by_config(config: AWgConfigModel):
+        """Asynchronously create a config file and write content to it. Returns the path to the file."""
+        INTERFACE_TMP = (
+            "[Interface]\n" +
+            f"PrivateKey = {config.Interface.PrivateKey}\n" +
+            f"Address = {config.Interface.Address}\n" +
+            f"Jc = {config.Interface.Jc}\n" +
+            f"Jmin = {config.Interface.Jmin}\n" +
+            f"Jmax = {config.Interface.Jmax}\n" +
+            f"S1 = {config.Interface.S1}\n" +
+            f"S2 = {config.Interface.S2}\n" +
+            f"H1 = {config.Interface.H1}\n" +
+            f"H2 = {config.Interface.H2}\n" +
+            f"H3 = {config.Interface.H3}\n" +
+            f"H4 = {config.Interface.H4}\n"
+        )
 
+        PEER_TMP = (
+            "[Peer]\n"
+            f"PublicKey = {config.Peer.PublicKey}\n"
+            f"AllowedIPs = {','.join(config.Peer.AllowedIPs)}\n"
+            f"Endpoint = {config.Peer.Endpoint}\n"
+            f"PersistentKeepalive = {config.Peer.PersistentKeepalive}\n"
+        )
 
-# async def get_config() -> WgConfigModel | None:
-#     """Fetch VPN config from vpn service."""
-#     url = f"{settings.VPN_SERVICE_URL}/api/config"
-#
-#     async with aiohttp.ClientSession() as session:
-#         try:
-#             async with session.post(url) as response:
-#                 if response.status != 200:
-#                     logger.error(f"Failed to fetch config: {response.status} - {await response.text()}")
-#                     raise ConfigFetchError(f"Error fetching config: {response.status}")
-#
-#                 data = await response.json()
-#                 return WgConfigModel(**data)
-#
-#         except (aiohttp.ClientError, ValidationError) as e:
-#             logger.error("An error occurred: %s", e)
-#             return None
+        file_name = hash_id(config.config_id)[0:20]
+        file_path = Path(__file__).parent / file_name  # Получаем путь к текущей директории скрипта и добавляем имя файла
 
-async def get_config() -> AWgConfigModel:
-        return AWgConfigModel(**test_config['example'])
+        async with aiofiles.open(file_path, 'w') as file:
+            await file.write(INTERFACE_TMP + "\n" + PEER_TMP)
+
+        return file_path

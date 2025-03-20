@@ -20,7 +20,7 @@ class Peer(BaseModel):
     PublicKey: constr(min_length=44, max_length=44)  # Same as the private key
     AllowedIPs: List[str]  # You can add custom validation if you want stricter control over CIDR
     Endpoint: str  # It's a combination of an IP and a port, so a stricter format could be added via validation
-    PersistentKeepalive: int | None = None
+    PersistentKeepalive: int | None = 25
 
 
 class AWgConfigModel(BaseModel):

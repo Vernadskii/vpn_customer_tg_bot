@@ -3,36 +3,29 @@ import tempfile
 
 import pytest
 from telegram_bot.vpn_service.api_models import AWgConfigModel
-from telegram_bot.vpn_service.tests.test_data import test_config
-from telegram_bot.vpn_service.utils import create_config_file_async
+from telegram_bot.vpn_service.service import VPNService
+from telegram_bot.vpn_service.tests.test_data import test_awg_config_data_dict
 
 
 @pytest.fixture
-def temp_file():
-    """Fixture that return file path and remove file at the end."""
-    _, temp_path = tempfile.mkstemp()
-    yield temp_path
-    os.remove(temp_path)  # Teardown: remove the temp file
+def awg_config_object():
+    return AWgConfigModel(**test_awg_config_data_dict)
 
 
-def test_creation_wg_config_model_instance():
-    config = AWgConfigModel(**test_config['example'])
-    print(config)
+class TestVPNService:
+    @pytest.mark.asyncio
+    async def test_create_file_by_config(self, awg_config_object):
+        vpn_service = VPNService()
+        file_path = await vpn_service.create_file_by_config(awg_config_object)
 
+        # checking the file:
+        with open(file_path, "r") as f:
+            content = f.read()
 
-@pytest.mark.asyncio
-async def test_creation_wg_config_file(temp_file):
-    assert os.path.exists(temp_file)
-    config = AWgConfigModel(**test_config['example'])
-    await create_config_file_async(temp_file, config)
-
-    # checking file:
-    with open(temp_file, "r") as f:
-        content = f.read()
-
-    print(f"\nFile content:\n{content}")
-    assert '[Interface]' in content
-    assert '[Peer]' in content
+        assert '[Interface]' in content
+        assert '[Peer]' in content
+        # removing the file
+        os.remove(file_path)
 
 
 
