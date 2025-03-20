@@ -6,7 +6,7 @@ from telegram import CallbackQuery
 from telegram_bot.handlers.onboarding.keyboards import make_keyboard_for_start_command
 from telegram_bot.handlers.onboarding.static_text import MAIN_MENU
 from telegram_bot.main import bot
-from telegram_bot.vpn_service.api import get_config
+from telegram_bot.vpn_service.service import get_config
 from telegram_bot.vpn_service.utils import create_config_file_async
 
 

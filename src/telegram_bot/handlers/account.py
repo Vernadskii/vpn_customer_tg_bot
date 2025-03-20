@@ -5,10 +5,11 @@ from telegram_bot.handlers import static_text
 from telegram_bot.handlers.start_command import start_command
 
 simple_back_keyboard = [
-        [
-            InlineKeyboardButton(static_text.BACK, callback_data=static_text.BACK_ACCOUNT_CALLBACK),
-        ],
-    ]
+    [
+        InlineKeyboardButton(static_text.BACK, callback_data=static_text.BACK_ACCOUNT_CALLBACK),
+    ],
+]
+
 
 async def propose_account(update: Update, context: CallbackContext) -> int:
     keyboard = [
@@ -17,7 +18,8 @@ async def propose_account(update: Update, context: CallbackContext) -> int:
             InlineKeyboardButton(static_text.BUY_VPN_BUTTON, callback_data=static_text.BUY_VPN_CALLBACK)
         ],
         [
-            InlineKeyboardButton(static_text.MY_SUBSCRIPTIONS_BUTTON, callback_data=static_text.MY_SUBSCRIPTIONS_CALLBACK)
+            InlineKeyboardButton(static_text.MY_SUBSCRIPTIONS_BUTTON,
+                                 callback_data=static_text.MY_SUBSCRIPTIONS_CALLBACK)
         ],
         [
             InlineKeyboardButton(static_text.BACK, callback_data=static_text.BACK_CALLBACK),
@@ -86,7 +88,8 @@ account_conversation = ConversationHandler(
             CallbackQueryHandler(handle_my_subscription, pattern=f"^{static_text.MY_SUBSCRIPTIONS_CALLBACK}$"),
             CallbackQueryHandler(handle_end_account_level, pattern=f"^{static_text.BACK_CALLBACK}$"),
         ],
-        static_text.BACK_TO_ACCOUNT: [CallbackQueryHandler(handle_back_to_account, pattern=f"^{static_text.BACK_ACCOUNT_CALLBACK}$")]
+        static_text.BACK_TO_ACCOUNT: [
+            CallbackQueryHandler(handle_back_to_account, pattern=f"^{static_text.BACK_ACCOUNT_CALLBACK}$")]
     },
     fallbacks=[
         CommandHandler("stop", stop_nested),

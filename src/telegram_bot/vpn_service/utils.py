@@ -1,6 +1,6 @@
 import aiofiles
 
-from telegram_bot.vpn_service.models import WgConfigModel
+from telegram_bot.vpn_service.api_models import WgConfigModel
 
 # # Configure logging
 # logging.basicConfig(level=logging.DEBUG)

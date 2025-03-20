@@ -2,7 +2,7 @@ import os
 import tempfile
 
 import pytest
-from telegram_bot.vpn_service.models import WgConfigModel
+from telegram_bot.vpn_service.api_models import WgConfigModel
 from telegram_bot.vpn_service.tests.test_data import test_config
 from telegram_bot.vpn_service.utils import create_config_file_async
 
