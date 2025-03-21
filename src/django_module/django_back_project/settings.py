@@ -12,12 +12,10 @@ from django.core.exceptions import ImproperlyConfigured
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Load env variables from file
 dotenv_file = BASE_DIR / ".env"
 if os.path.isfile(dotenv_file):
     dotenv.load_dotenv(dotenv_file)
-
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv(
@@ -30,8 +28,7 @@ if os.environ.get('DJANGO_DEBUG', default=False) in ['True', 'true', '1', True]:
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = ["*",]  # since Telegram uses a lot of IPs for webhooks
-
+ALLOWED_HOSTS = ["*", ]  # since Telegram uses a lot of IPs for webhooks
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -62,11 +59,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
-
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar']
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
-
 
 INTERNAL_IPS = [
     # ...
@@ -100,7 +95,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'django_module.django_back_project.wsgi.application'
 ASGI_APPLICATION = 'django_module.django_back_project.asgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -126,7 +120,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -135,7 +128,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -155,33 +147,20 @@ def _get_env_variable(var_name: str, default=None):
             return default
         raise ImproperlyConfigured(f"Set the {var_name} environment variable")
 
+
 # -----> VPN Service
-VPN_SERVICE_URL = os.getenv("VPN_SERVICE_URL")
-VPN_SERVICE_SECRET_KEY = os.getenv("VPN_SERVICE_SECRET_KEY")
-if VPN_SERVICE_URL is None:
-    logging.error("Please, provide VPN_SERVICE_URL environment variable.")
-    sys.exit(1)
-if VPN_SERVICE_SECRET_KEY is None:
-    logging.error("Please, provide VPN_SERVICE_SECRET_KEY environment variable.")
-    sys.exit(1)
+VPN_SERVICE_URL = _get_env_variable("VPN_SERVICE_URL")
+VPN_SERVICE_SECRET_KEY = _get_env_variable("VPN_SERVICE_SECRET_KEY")
 
 # -----> TELEGRAM
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-if TELEGRAM_TOKEN is None:
-    logging.error("Please, provide TELEGRAM_TOKEN environment variable.")
-    sys.exit(1)
-
-TELEGRAM_LOGS_CHAT_ID = os.getenv("TELEGRAM_LOGS_CHAT_ID", default=None)
+TELEGRAM_TOKEN = _get_env_variable("TELEGRAM_TOKEN")
+TELEGRAM_LOGS_CHAT_ID = os.getenv("TELEGRAM_LOGS_CHAT_ID", None)
 
 # -----> ENV variable
 env_values = ('local', 'test', 'prod')
-ENV = os.getenv("ENV")  # (local, test, prod)
-if ENV is None:
-    logging.error("Please, provide ENV environment variable.")
-    sys.exit(1)
+ENV = _get_env_variable("ENV")
 if ENV not in env_values:
-    logging.error(f"ENV variable has invalid value. Choose from {str(env_values)}.")
-    sys.exit(1)
+    raise ImproperlyConfigured(f"ENV variable has invalid value. Choose from {env_values}.")
 
 # -----> SENTRY
 # import sentry_sdk

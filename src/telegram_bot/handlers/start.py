@@ -1,5 +1,5 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ConversationHandler, CommandHandler, ContextTypes, CallbackContext
+from telegram import Update
+from telegram.ext import ConversationHandler, CommandHandler, ContextTypes
 
 from telegram_bot.handlers import static_text
 from telegram_bot.handlers.account import account_conversation

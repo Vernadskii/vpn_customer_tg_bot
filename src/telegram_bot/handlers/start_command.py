@@ -13,7 +13,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         [InlineKeyboardButton(static_text.INFO_BUTTON, callback_data=static_text.INFO_CALLBACK)]
     ]
 
-    u, created = await Client.get_client_or_create(update, context)
+    u, created = await Client.get_client_or_create(update.effective_user.to_dict())
 
     text = static_text.START_CREATED.format(first_name=u.username) if created \
         else static_text.START_OLD_USER.format(first_name=u.username)

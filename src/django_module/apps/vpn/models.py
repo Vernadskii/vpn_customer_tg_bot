@@ -4,8 +4,6 @@ from typing import Union, Optional, Tuple
 
 from django.db import models
 from django.db.models import Manager
-from telegram import Update
-from telegram.ext import CallbackContext
 
 from django_module.apps.utils.models import CreateUpdateTracker
 
@@ -29,9 +27,8 @@ class Client(CreateUpdateTracker):
         return f'username: @{self.username}' if self.username is not None else f'id: {self.id}'
 
     @classmethod
-    async def get_client_or_create(cls, update: Update, context: CallbackContext) -> Tuple[Client, bool]:
+    async def get_client_or_create(cls, user_dict_data: dict) -> Tuple[Client, bool]:
         """ python-telegram-bot's Update, Context --> User instance """
-        user_dict_data = update.effective_user.to_dict()
         u, created = await cls.objects.aget_or_create(
             chat_id=user_dict_data["id"],
             username=user_dict_data['username']
@@ -60,7 +57,7 @@ class Subscription(models.Model):
 
     def __str__(self):
         return (
-            f'client: @{self.client.id}, config: {self.config.id}, '
+            f'client: @{self.client.id}, '
             f'start_date: {self.start_date}, end_date: {self.end_date}, amount: {self.amount}',
         )
 

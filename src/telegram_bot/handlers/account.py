@@ -140,10 +140,10 @@ account_conversation = ConversationHandler(
             CallbackQueryHandler(handle_buy_specific, pattern=f"^{static_text.BUY_CALLBACK_PATTERN}$"),
             CallbackQueryHandler(handle_back_to_account, pattern=f"^{static_text.BACK_ACCOUNT_CALLBACK}$"),
         ],
-        static_text.BUYING_STATE: [
-            PreCheckoutQueryHandler(precheckout_callback),
-            MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback)
-        ]
+        # static_text.BUYING_STATE: [
+        #     PreCheckoutQueryHandler(precheckout_callback),
+        #     MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback)
+        # ]
     },
     fallbacks=[
         CommandHandler("stop", stop_nested),
