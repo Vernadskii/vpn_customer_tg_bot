@@ -1,17 +1,21 @@
 import logging
 from telegram import Update, LabeledPrice
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, PreCheckoutQueryHandler, CallbackContext
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, PreCheckoutQueryHandler, CallbackContext, \
+    ConversationHandler
 
 from tutorials import TEST_TOKEN
 
 # Вставьте сюда ваш токен
 TOKEN = TEST_TOKEN
 
+CHOOSING_START, PAYMENT_STATE = 1, 2
+
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("Привет! Выберите команду /buy для покупки.")
+    return CHOOSING_START
 
 async def buy(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
@@ -32,28 +36,32 @@ async def buy(update: Update, context: CallbackContext):
         prices=prices,
         start_parameter="start_parameter"
     )
+    return PAYMENT_STATE
 
-async def precheckout_callback(update: Update, context: CallbackContext):
-    query = update.pre_checkout_query
-    if query.invoice_payload != 'Custom-Payload':
-        await query.answer(ok=False, error_message="Что-то пошло не так...")
-    else:
-        await query.answer(ok=True)
 
-async def successful_payment_callback(update: Update, context: CallbackContext):
-    payment = update.message.successful_payment
-    telegram_payment_charge_id = payment.telegram_payment_charge_id
-    await update.message.reply_text(f"Платеж успешно выполнен! Ваш ID: {telegram_payment_charge_id}")
+async def help(update: Update, context: CallbackContext):
+    await update.message.reply_text(f"Проверка выполнена")
+    return CHOOSING_START
 
 
 def main():
     application = Application.builder().token(TEST_TOKEN).build()
 
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("buy", buy))
-    application.add_handler(PreCheckoutQueryHandler(precheckout_callback))
-    application.add_handler(MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback))
-
+    start_conversation = ConversationHandler(
+        entry_points=[CommandHandler("start", start)],
+        states={
+            CHOOSING_START: [
+                CommandHandler("buy", buy),
+            ],
+            PAYMENT_STATE: [
+                PreCheckoutQueryHandler(precheckout_callback),
+                MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback),
+                CommandHandler("help", help),
+            ],
+        },
+        fallbacks=[],
+    )
+    application.add_handler(start_conversation)
     application.run_polling()
 
 

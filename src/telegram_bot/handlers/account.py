@@ -1,3 +1,5 @@
+import json
+
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice
 from telegram.ext import ConversationHandler, CommandHandler, CallbackContext, CallbackQueryHandler, \
     PreCheckoutQueryHandler, MessageHandler, filters
@@ -75,7 +77,6 @@ async def handle_buy_specific(update: Update, context: CallbackContext):
     month_text = month_text_dict[int(months_amount)]
     title = f"Подписка VPN на {month_text}"
     description = "После оплаты этого счета вам будет присвоен конфиг для пользования ВПН-ом"
-    payload = "Custom-Payload"
     currency = "XTR"  # Используем Telegram Stars (XTR)
     price = price_dict[months_amount]  # Цена в XTR
 
@@ -85,27 +86,13 @@ async def handle_buy_specific(update: Update, context: CallbackContext):
         chat_id=update.callback_query.message.chat.id,
         title=title,
         description=description,
-        payload=payload,
+        payload=json.dumps({"months_amount": months_amount}),
         provider_token="",  # Пустой токен для цифровых товаров
         currency=currency,
         prices=prices,
-        start_parameter="start_parameter"
+        start_parameter="start_parameter",
     )
     return static_text.BUYING_STATE
-
-
-async def precheckout_callback(update: Update, context: CallbackContext):
-    query = update.pre_checkout_query
-    if query.invoice_payload != 'Custom-Payload':
-        await query.answer(ok=False, error_message="Что-то пошло не так...")
-    else:
-        await query.answer(ok=True)
-
-
-async def successful_payment_callback(update: Update, context: CallbackContext):
-    payment = update.message.successful_payment
-    telegram_payment_charge_id = payment.telegram_payment_charge_id
-    await update.message.reply_text(f"Платеж успешно выполнен! Ваш ID: {telegram_payment_charge_id}")
 
 
 async def handle_my_subscription(update: Update, context: CallbackContext):

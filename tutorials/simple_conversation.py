@@ -10,6 +10,8 @@ from telegram.ext import (
     filters,
 )
 
+from tutorials import TEST_TOKEN
+
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -123,7 +125,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 def main() -> None:
     """Run the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token("7487703638:AAEG5II88c5hkTdWDzjNYgMP3FtJeOJf1FQ").build()
+    application = Application.builder().token(TEST_TOKEN).build()
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(
