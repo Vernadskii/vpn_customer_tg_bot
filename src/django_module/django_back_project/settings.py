@@ -40,11 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd party apps
-    'django_celery_beat',
+    # 'django_celery_beat',
 
     # local apps
-    'django_module.apps.users.apps.UsersConfig',
-    #'django_module.apps.VpnConfigConfig',
+    'django_module.apps.vpn.apps.VpnConfig',
 ]
 
 MIDDLEWARE = [

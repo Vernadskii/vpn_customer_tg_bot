@@ -3,7 +3,7 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import ContextTypes
 
-from django_module.apps.users.models import User
+from django_module.apps.vpn.models import Client
 from telegram_bot.handlers import static_text
 
 
@@ -13,7 +13,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
         [InlineKeyboardButton(static_text.INFO_BUTTON, callback_data=static_text.INFO_CALLBACK)]
     ]
 
-    u, created = await User.get_user_and_created(update, context)
+    u, created = await Client.get_client_or_create(update, context)
 
     text = static_text.START_CREATED.format(first_name=u.username) if created \
         else static_text.START_OLD_USER.format(first_name=u.username)

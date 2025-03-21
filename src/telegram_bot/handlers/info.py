@@ -14,7 +14,6 @@ async def propose_info(update: Update, context: CallbackContext) -> int:
     info_keyboard = [
         [
             InlineKeyboardButton(static_text.ABOUT_US_BUTTON, callback_data=static_text.ABOUT_US_CALLBACK),
-            InlineKeyboardButton(static_text.PRICING_BUTTON, callback_data=static_text.PRICING_CALLBACK),
         ],
         [
             InlineKeyboardButton(static_text.HOW_TO_USE_BUTTON, callback_data=static_text.HOW_TO_USE_CALLBACK),
@@ -42,14 +41,6 @@ async def handle_about_us(update: Update, context: CallbackContext):
     return static_text.BACK_TO_INFO
 
 
-async def handle_price(update: Update, context: CallbackContext):
-    await update.callback_query.edit_message_text(
-        text="Здесь наш прейскурант",
-        reply_markup=InlineKeyboardMarkup(simple_back_keyboard),
-    )
-    return static_text.BACK_TO_INFO
-
-
 async def handle_instruction(update: Update, context: CallbackContext):
     await update.callback_query.edit_message_text(
         text="Здесь инструкция по использованию.",
@@ -60,7 +51,7 @@ async def handle_instruction(update: Update, context: CallbackContext):
 
 async def handle_support(update: Update, context: CallbackContext):
     await update.callback_query.edit_message_text(
-        text="Здесь поддержка. Заглушка -- TODO",
+        text="Напишите нам по аккаунту @supportvpnbot12345",
         reply_markup=InlineKeyboardMarkup(simple_back_keyboard),
     )
     return static_text.BACK_TO_INFO
@@ -93,7 +84,6 @@ info_conversation = ConversationHandler(
     states={
         static_text.CHOOSING_INFO: [
             CallbackQueryHandler(handle_about_us, pattern=f"^{static_text.ABOUT_US_CALLBACK}$"),
-            CallbackQueryHandler(handle_price, pattern=f"^{static_text.PRICING_CALLBACK}$"),
             CallbackQueryHandler(handle_instruction, pattern=f"^{static_text.HOW_TO_USE_CALLBACK}$"),
             CallbackQueryHandler(handle_support, pattern=f"^{static_text.SUPPORT_CALLBACK}$"),
             CallbackQueryHandler(handle_end_info_level, pattern=f"^{static_text.BACK_CALLBACK}$"),

@@ -1,5 +1,4 @@
 import os
-import tempfile
 
 import pytest
 from telegram_bot.vpn_service.api_models import AWgConfigModel
