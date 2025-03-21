@@ -7,6 +7,8 @@ import dotenv
 
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -144,11 +146,24 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 
 
+def _get_env_variable(var_name: str, default=None):
+    """Get the environment variable or raise an error."""
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        if default is not None:
+            return default
+        raise ImproperlyConfigured(f"Set the {var_name} environment variable")
+
+# -----> VPN Service
 VPN_SERVICE_URL = os.getenv("VPN_SERVICE_URL")
+VPN_SERVICE_SECRET_KEY = os.getenv("VPN_SERVICE_SECRET_KEY")
 if VPN_SERVICE_URL is None:
     logging.error("Please, provide VPN_SERVICE_URL environment variable.")
     sys.exit(1)
-
+if VPN_SERVICE_SECRET_KEY is None:
+    logging.error("Please, provide VPN_SERVICE_SECRET_KEY environment variable.")
+    sys.exit(1)
 
 # -----> TELEGRAM
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
@@ -157,6 +172,16 @@ if TELEGRAM_TOKEN is None:
     sys.exit(1)
 
 TELEGRAM_LOGS_CHAT_ID = os.getenv("TELEGRAM_LOGS_CHAT_ID", default=None)
+
+# -----> ENV variable
+env_values = ('local', 'test', 'prod')
+ENV = os.getenv("ENV")  # (local, test, prod)
+if ENV is None:
+    logging.error("Please, provide ENV environment variable.")
+    sys.exit(1)
+if ENV not in env_values:
+    logging.error(f"ENV variable has invalid value. Choose from {str(env_values)}.")
+    sys.exit(1)
 
 # -----> SENTRY
 # import sentry_sdk
