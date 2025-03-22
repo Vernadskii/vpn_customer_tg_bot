@@ -1,5 +1,4 @@
 import hashlib
-import logging
 from pathlib import Path
 from typing import Literal
 
@@ -11,10 +10,6 @@ from pydantic import ValidationError
 from django_module.django_back_project import settings
 from logging_config import tgbot_logger
 from telegram_bot.vpn_service.api_models import AWgConfigModel
-
-# # Configure logging
-# logging.basicConfig(level=logging.DEBUG)
-# logger = logging.getLogger(__name__)
 
 
 class ConfigCreateError(Exception):

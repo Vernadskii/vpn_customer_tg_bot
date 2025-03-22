@@ -1,5 +1,6 @@
 import json
 import os
+from django.utils import timezone
 
 from dateutil.relativedelta import relativedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice
@@ -141,7 +142,7 @@ async def successful_payment_callback(update: Update, context: CallbackContext):
         amount=months_amount,
     )
     await PaymentHistory.objects.acreate(
-        payment_time=dt.datetime.now(), transaction_id=payment.telegram_payment_charge_id,
+        payment_time=timezone.now(), transaction_id=payment.telegram_payment_charge_id,
         amount=payment.total_amount, subscription=subscription, invoice_payload=payment.invoice_payload,
     )
     try:
