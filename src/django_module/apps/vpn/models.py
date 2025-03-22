@@ -44,10 +44,6 @@ class Client(CreateUpdateTracker):
             return cls.objects.filter(user_id=int(username)).first()
         return cls.objects.filter(username__iexact=username).first()
 
-    @classmethod
-    async def get_admin_clients(cls):
-        return await cls.objects.filter(is_admin=True).all()
-
 
 class Subscription(models.Model):
     client = models.ForeignKey(Client, on_delete=models.PROTECT)
@@ -70,9 +66,9 @@ class Config(models.Model):
 
 
 class PaymentHistory(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.PROTECT)
     payment_time = models.DateTimeField(null=False, blank=False, verbose_name='Payment date')
     transaction_id = models.TextField(null=False, blank=False, verbose_name='Transaction ID')
     amount = models.IntegerField(null=False, blank=False, verbose_name='Amount in Telegram starts')
     subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
+    invoice_payload = models.TextField(null=False, blank=False, verbose_name='Invoice payload')
 

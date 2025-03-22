@@ -38,6 +38,7 @@ class VPNService:
             self._session = aiohttp.ClientSession(
                 base_url=self._base_url,
                 timeout=ClientTimeout(total=10),  # 10 seconds for request timeout
+                headers={"X-API-Key": settings.VPN_SERVICE_SECRET_KEY}
             )
 
     async def close_session(self):  # TODO: add invoking at shutdown
@@ -50,7 +51,7 @@ class VPNService:
         create_url = f"/api/{self.api_version}/config"
         payload = {'proto': self._config_type}  # sets protocol type
         try:
-            async with self._session.post(create_url, data=payload) as response:
+            async with self._session.post(create_url, json=payload) as response:
                 data = await response.json()
 
                 if response.status not in (200, 201):

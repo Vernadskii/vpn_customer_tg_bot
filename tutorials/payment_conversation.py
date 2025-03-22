@@ -13,9 +13,11 @@ CHOOSING_START, PAYMENT_STATE = 1, 2
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("Привет! Выберите команду /buy для покупки.")
     return CHOOSING_START
+
 
 async def buy(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
@@ -39,6 +41,18 @@ async def buy(update: Update, context: CallbackContext):
     return PAYMENT_STATE
 
 
+async def precheckout_callback(update: Update, context: CallbackContext):
+    query = update.pre_checkout_query
+    if False:
+        await query.answer(ok=False, error_message="Что-то пошло не так...")
+    await query.answer(ok=True)
+
+
+async def successful_payment_callback(update: Update, context: CallbackContext):
+    payment = update.message.successful_payment
+    await update.message.reply_text(f"Спасибо за выбор!")
+
+
 async def help(update: Update, context: CallbackContext):
     await update.message.reply_text(f"Проверка выполнена")
     return CHOOSING_START
@@ -54,14 +68,15 @@ def main():
                 CommandHandler("buy", buy),
             ],
             PAYMENT_STATE: [
-                PreCheckoutQueryHandler(precheckout_callback),
                 MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback),
                 CommandHandler("help", help),
             ],
         },
         fallbacks=[],
     )
+
     application.add_handler(start_conversation)
+    application.add_handler(PreCheckoutQueryHandler(precheckout_callback))
     application.run_polling()
 
 

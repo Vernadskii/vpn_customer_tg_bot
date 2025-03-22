@@ -1,6 +1,8 @@
 import asyncio
 import os, django
 
+from telegram_bot.vpn_service.service import VPNService
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_module.django_back_project.settings')
 django.setup()
 
@@ -9,6 +11,15 @@ from telegram import Update
 
 from django_module.django_back_project.settings import TELEGRAM_TOKEN
 from telegram_bot.dispatcher import setup_handlers
+
+from warnings import filterwarnings
+from telegram.warnings import PTBUserWarning
+
+# filterwarnings(
+#     action="ignore",
+#     message=r"*If 'per_message=False', 'CallbackQueryHandler' will not be tracked for every message*",
+#     category=PTBUserWarning,
+# )
 
 
 async def run_polling(tg_token: str = TELEGRAM_TOKEN):
@@ -35,4 +46,5 @@ if __name__ == "__main__":
     try:
         asyncio.run(run_polling())
     except (KeyboardInterrupt, SystemExit):
+        VPNService().close_session()
         print("Bot process interrupted.")

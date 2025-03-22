@@ -1,11 +1,18 @@
 import json
+import os
 
+from dateutil.relativedelta import relativedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice
-from telegram.ext import ConversationHandler, CommandHandler, CallbackContext, CallbackQueryHandler, \
-    PreCheckoutQueryHandler, MessageHandler, filters
+from telegram.ext import (
+    ConversationHandler, CommandHandler, CallbackContext, CallbackQueryHandler, MessageHandler, filters,
+)
 
+import datetime as dt
+from django_module.apps.vpn.models import Client, Subscription, PaymentHistory, Config
 from telegram_bot.handlers import static_text
 from telegram_bot.handlers.start_command import start_command
+from telegram_bot.utils import notify_admin_users
+from telegram_bot.vpn_service.service import VPNService
 
 simple_back_keyboard = [
     [
@@ -124,6 +131,44 @@ async def stop_nested(update: Update, context: CallbackContext) -> str:
     return static_text.STOPPING
 
 
+async def successful_payment_callback(update: Update, context: CallbackContext):
+    payment = update.message.successful_payment
+    months_amount = json.loads(payment.invoice_payload)['months_amount']
+    client, _ = await Client.get_client_or_create(update.effective_user.to_dict())
+    subscription = await Subscription.objects.acreate(
+        client=client, start_date=dt.date.today(), end_date=dt.date.today()+relativedelta(months=months_amount),
+        amount=months_amount,
+    )
+    await PaymentHistory.objects.acreate(
+        payment_time=dt.datetime.now(), transaction_id=payment.telegram_payment_charge_id,
+        amount=payment.total_amount, subscription=subscription, invoice_payload=payment.invoice_payload,
+    )
+    config = await VPNService().create_config()
+    if config is None:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=(
+                f"Платеж успешно выполнен! В данный момент возникли технические сложности, "
+                f"с вами свяжется специалист поддержки при первой возможности и вышлет конфиг"
+            )
+        )
+        await notify_admin_users(
+            context, f"Error ⚠️: Клиент {client.username} заплатил,"
+                     f" но не получил конфиг так как VPN сервис оказался недоступен."
+        )
+        return
+
+    config_file_path = await VPNService.create_file_by_config(config)
+    await Config.objects.acreate(data=config.model_dump(), activated=True, vpn_id=config.config_id, subscription=subscription)
+    await context.bot.send_document(
+        update.effective_user.id,
+        caption=f'Это ваш персональный файл конфигурации VPN. Он действует до {subscription.end_date}',
+        document=config_file_path,
+    )
+    os.remove(config_file_path)
+    await update.message.reply_text(f"Спасибо за выбор!")
+
+
 # Set up second level ConversationHandler (account)
 account_conversation = ConversationHandler(
     entry_points=[CallbackQueryHandler(propose_account, pattern=f"^{static_text.PERSONAL_ACCOUNT_CALLBACK}$")],
@@ -140,10 +185,9 @@ account_conversation = ConversationHandler(
             CallbackQueryHandler(handle_buy_specific, pattern=f"^{static_text.BUY_CALLBACK_PATTERN}$"),
             CallbackQueryHandler(handle_back_to_account, pattern=f"^{static_text.BACK_ACCOUNT_CALLBACK}$"),
         ],
-        # static_text.BUYING_STATE: [
-        #     PreCheckoutQueryHandler(precheckout_callback),
-        #     MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback)
-        # ]
+        static_text.BUYING_STATE: [
+            MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback)
+        ]
     },
     fallbacks=[
         CommandHandler("stop", stop_nested),
