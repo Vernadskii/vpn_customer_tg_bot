@@ -31,21 +31,21 @@ async def run_polling(tg_token: str = TELEGRAM_TOKEN):
     await application.initialize()
     await application.start()
     await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
-    tgbot_logger.info("Bot is running in polling mode...")
+    tgbot_logger.info("Bot has been started in polling mode...")
 
     try:
         await asyncio.Event().wait()  # Wait indefinitely until manually stopped
     except asyncio.CancelledError:
-        print("Bot is shutting down...")  # Handle the cancellation gracefully
+        tgbot_logger.info("Bot is shutting down...")  # Handle the cancellation gracefully
     finally:
         # Ensure the bot is stopped gracefully
         await VPNService().close_session()
         await application.stop()
-        print("Bot has been stopped.")
+        tgbot_logger.info("Bot has been stopped.")
 
 
 if __name__ == "__main__":
     try:
         asyncio.run(run_polling())
     except (KeyboardInterrupt, SystemExit):
-        print("Bot process interrupted.")
+        tgbot_logger.info("Bot process interrupted.")

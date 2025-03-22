@@ -9,6 +9,7 @@ from telegram.ext import (
 
 import datetime as dt
 from django_module.apps.vpn.models import Client, Subscription, PaymentHistory, Config
+from logging_config import tgbot_logger
 from telegram_bot.handlers import static_text
 from telegram_bot.handlers.start_command import start_command
 from telegram_bot.utils import notify_admin_users
@@ -157,6 +158,7 @@ async def successful_payment_callback(update: Update, context: CallbackContext):
             context, f"Error ⚠️: Клиент {client.username} заплатил,"
                      f" но не получил конфиг так как VPN сервис оказался недоступен. Лог ошибки: {str(ex)}"
         )
+        tgbot_logger.critical(f"Got ConfigCreateError after client payment: {str(ex)}")
         return
 
     config_file_path = await VPNService.create_file_by_config(config)
@@ -168,6 +170,7 @@ async def successful_payment_callback(update: Update, context: CallbackContext):
     )
     os.remove(config_file_path)
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Спасибо за выбор!")
+    tgbot_logger.info(f"Succesfully created new config {config.config_id} for user {client.username}")
 
 
 # Set up second level ConversationHandler (account)

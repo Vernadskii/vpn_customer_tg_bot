@@ -9,6 +9,7 @@ from aiohttp import ClientTimeout, ClientError, ClientResponseError
 from pydantic import ValidationError
 
 from django_module.django_back_project import settings
+from logging_config import tgbot_logger
 from telegram_bot.vpn_service.api_models import AWgConfigModel
 
 # # Configure logging
@@ -55,23 +56,23 @@ class VPNService:
                 data = await response.json()
 
                 if response.status not in (200, 201):
-                    print(f"Error creating a new config. Status:{response.status}, data: {data}")
+                    tgbot_logger.error(f"Error creating a new config. Status:{response.status}, data: {data}")
                     raise ConfigCreateError(f"Error creating a new config: {response.status}, {data}")
 
                 try:
                     return AWgConfigModel(**data)
                 except ValidationError as ve:
-                    print(f"Validation error: {ve.errors()}")  # TODO: add logging
+                    tgbot_logger.error(f"Validation error: {ve.errors()}")
                     raise ConfigCreateError from ve
 
         except ClientTimeout as ct:
-            print(f"Timeout occurred while trying to reach {create_url}")
+            tgbot_logger.error(f"Timeout occurred while trying to reach {create_url}")
             raise ConfigCreateError from ct
         except (ClientError, ClientResponseError) as e:
-            print(f"HTTP error occurred: {e.status} {e.message} when accessing {create_url}")
+            tgbot_logger.error(f"HTTP error occurred: {e.status} {e.message} when accessing {create_url}")
             raise ConfigCreateError from e
         except Exception as e:
-            print(f"An unexpected error occurred: {str(e)}")
+            tgbot_logger.error(f"An unexpected error occurred: {str(e)}")
             raise ConfigCreateError from e
 
     def deactivate_config(self):
