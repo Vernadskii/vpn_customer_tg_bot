@@ -1,5 +1,6 @@
 import json
 import os
+
 from django.utils import timezone
 
 from dateutil.relativedelta import relativedelta
@@ -23,22 +24,33 @@ simple_back_keyboard = [
 ]
 
 
+async def _generate_text_for_account(user_dict: dict) -> str:
+    client, _ = await Client.get_client_or_create(user_dict)
+    list_of_subscriptions = await client.get_subscriptions()
+    res_string = "\n".join([f"{number}. Период: {sub.start_date}-{sub.end_date}"
+                            for number, sub in enumerate(list_of_subscriptions, 1)])
+    return res_string
+
+
 async def propose_account(update: Update, context: CallbackContext) -> int:
     keyboard = [
         [
             InlineKeyboardButton(static_text.BUY_VPN_BUTTON, callback_data=static_text.BUY_VPN_CALLBACK)
         ],
-        [
-            InlineKeyboardButton(static_text.MY_SUBSCRIPTIONS_BUTTON,
-                                 callback_data=static_text.MY_SUBSCRIPTIONS_CALLBACK)
-        ],
+        # [
+        #     InlineKeyboardButton(static_text.MY_SUBSCRIPTIONS_BUTTON,
+        #                          callback_data=static_text.MY_SUBSCRIPTIONS_CALLBACK)
+        # ],
         [
             InlineKeyboardButton(static_text.BACK, callback_data=static_text.BACK_CALLBACK),
         ]
     ]
 
+    account_text = await _generate_text_for_account(update.effective_user.to_dict())
+
     await update.callback_query.edit_message_text(
-        text="Баланс: х\nДата окончания подписки: DD-MM-YYYY",
+        text=f"Мои подписки:\n"
+             f"{account_text}",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
     return static_text.CHOOSING_ACCOUNT_ACTION
@@ -104,12 +116,12 @@ async def handle_buy_specific(update: Update, context: CallbackContext):
     return static_text.BUYING_STATE
 
 
-async def handle_my_subscription(update: Update, context: CallbackContext):
-    await update.callback_query.edit_message_text(
-        text="Управление подпиской.",
-        reply_markup=InlineKeyboardMarkup(simple_back_keyboard),
-    )
-    return static_text.BACK_TO_ACCOUNT
+# async def handle_my_subscription(update: Update, context: CallbackContext):
+#     await update.callback_query.edit_message_text(
+#         text="Управление подпиской.",
+#         reply_markup=InlineKeyboardMarkup(simple_back_keyboard),
+#     )
+#     return static_text.BACK_TO_ACCOUNT
 
 
 async def handle_end_account_level(update: Update, context: CallbackContext):
@@ -170,8 +182,13 @@ async def successful_payment_callback(update: Update, context: CallbackContext):
         document=config_file_path,
     )
     os.remove(config_file_path)
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Спасибо за выбор!")
-    tgbot_logger.info(f"Succesfully created new config {config.config_id} for user {client.username}")
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Спасибо за выбор!",
+    )
+    tgbot_logger.info(f"Successfully created new config {config.config_id} for user {client.username}")
+    await start_command(update, context)
+    return ConversationHandler.END
 
 
 # Set up second level ConversationHandler (account)
@@ -180,21 +197,18 @@ account_conversation = ConversationHandler(
     states={
         static_text.CHOOSING_ACCOUNT_ACTION: [
             CallbackQueryHandler(handle_buy_subscription, pattern=f"^{static_text.BUY_VPN_CALLBACK}$"),
-            CallbackQueryHandler(handle_my_subscription, pattern=f"^{static_text.MY_SUBSCRIPTIONS_CALLBACK}$"),
+            # CallbackQueryHandler(handle_my_subscription, pattern=f"^{static_text.MY_SUBSCRIPTIONS_CALLBACK}$"),
             CallbackQueryHandler(handle_end_account_level, pattern=f"^{static_text.BACK_CALLBACK}$"),
-        ],
-        static_text.BACK_TO_ACCOUNT: [
-            CallbackQueryHandler(handle_back_to_account, pattern=f"^{static_text.BACK_ACCOUNT_CALLBACK}$"),
         ],
         static_text.CHOOSING_PRICE: [
             CallbackQueryHandler(handle_buy_specific, pattern=f"^{static_text.BUY_CALLBACK_PATTERN}$"),
-            CallbackQueryHandler(handle_back_to_account, pattern=f"^{static_text.BACK_ACCOUNT_CALLBACK}$"),
         ],
         static_text.BUYING_STATE: [
             MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback)
         ]
     },
     fallbacks=[
+        CallbackQueryHandler(handle_back_to_account, pattern=f"^{static_text.BACK_ACCOUNT_CALLBACK}$"),
         CommandHandler("stop", stop_nested),
     ],
     map_to_parent={

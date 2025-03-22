@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Union, Optional, Tuple
 
+from asgiref.sync import sync_to_async
 from django.db import models
 from django.db.models import Manager
 
@@ -26,6 +27,10 @@ class Client(CreateUpdateTracker):
     def __str__(self):
         return f'username: @{self.username}' if self.username is not None else f'id: {self.id}'
 
+    @sync_to_async
+    def get_subscriptions(self):
+        return list(self.subscription_set.all().order_by('end_date'))
+
     @classmethod
     async def get_client_or_create(cls, user_dict_data: dict) -> Tuple[Client, bool]:
         """ python-telegram-bot's Update, Context --> User instance """
@@ -49,7 +54,6 @@ class Subscription(models.Model):
     client = models.ForeignKey(Client, on_delete=models.PROTECT)
     start_date = models.DateField(null=False, blank=False, verbose_name='Start date')
     end_date = models.DateField(null=False, blank=False, verbose_name='End date')
-    amount = models.IntegerField(null=False, blank=False, verbose_name='Price for subscription')
 
     def __str__(self):
         return (
@@ -61,7 +65,7 @@ class Subscription(models.Model):
 class Config(models.Model):
     data = models.JSONField(default=dict, verbose_name='Config data')
     activated = models.BooleanField(null=False, blank=False, verbose_name='Is active config')
-    vpn_id = models.IntegerField(null=False, blank=False, verbose_name='Id in vpn service')
+    vpn_id = models.IntegerField(null=False, blank=False, verbose_name='Id in vpn service', unique=True)
     subscription = models.ForeignKey(Subscription, on_delete=models.PROTECT)
 
 
