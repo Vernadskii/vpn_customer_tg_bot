@@ -5,15 +5,15 @@ from typing import List
 class AWGInterface(BaseModel):
     PrivateKey: constr(min_length=44, max_length=44)  # WireGuard keys are base64-encoded and 44 characters long
     Address: str  # It could be more specific
-    H1: int
-    H2: int
-    H3: int
-    H4: int
-    Jc: int
-    Jmax: int
-    Jmin: int
-    S1: int
-    S2: int
+    h1: int
+    h2: int
+    h3: int
+    h4: int
+    jc: int
+    jmax: int
+    jmin: int
+    s1: int
+    s2: int
 
 
 class Peer(BaseModel):
@@ -31,26 +31,24 @@ class AWgConfigModel(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
         json_schema_extra={
-            "example": {
-                "Interface": {
-                    "Address": "10.0.0.7/32",
-                    "H1": 1227045251,
-                    "H2": 1227045252,
-                    "H3": 1227045253,
-                    "H4": 1227045254,
-                    "Jc": 10,
-                    "Jmax": 30,
-                    "Jmin": 20,
-                    "PrivateKey": "IPSgpX3YmAsARgs1Fd5KGEoFZzfj3nQ0SMHiG9zHXEE=",
-                    "S1": 100,
-                    "S2": 110
-                },
-                "Peer": {
-                    "PublicKey": "uMnvozNSuNG6pRbzL7jViHTECIhEzsD/GxMSvY5lBzM=",
-                    "AllowedIPs": ["10.0.0.0/24"],
-                    "Endpoint": "194.135.17.31:51000",
-                    "PersistentKeepalive": 25,
-                },
-            }
+            "Interface": {
+                "Address": "10.0.0.7/32",
+                "h1": 1227045251,
+                "h2": 1227045252,
+                "h3": 1227045253,
+                "h4": 1227045254,
+                "jc": 10,
+                "jmax": 30,
+                "jmin": 20,
+                "PrivateKey": "IPSgpX3YmAsARgs1Fd5KGEoFZzfj3nQ0SMHiG9zHXEE=",
+                "s1": 100,
+                "s2": 110
+            },
+            "Peer": {
+                "PublicKey": "uMnvozNSuNG6pRbzL7jViHTECIhEzsD/GxMSvY5lBzM=",
+                "AllowedIPs": ["10.0.0.0/24"],
+                "Endpoint": "194.135.17.31:51000",
+                "PersistentKeepalive": 25,
+            },
         }
     )

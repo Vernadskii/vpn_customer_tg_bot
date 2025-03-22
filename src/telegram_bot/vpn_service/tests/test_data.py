@@ -1,23 +1,23 @@
 test_awg_config_data_dict = {
-    "Interface": {
-        "PrivateKey": "IPSgpX3YmAsARgs1Fd5KGEoFZzfj3nQ0SMHiG9zHXEE=",
-        "Address": "10.0.0.7/32",
-        "H1": 1227045251,
-        "H2": 1227045252,
-        "H3": 1227045253,
-        "H4": 1227045254,
-        "Jc": 10,
-        "Jmax": 30,
-        "Jmin": 20,
-        "S1": 100,
-        "S2": 110,
+    'config_id': 7,
+    'Interface': {
+        'PrivateKey': 'CKdLZABaToKVcXVTTO8c5qsTYjQBsgAtUrCyzBTVMnI=',
+        'Address': '10.16.1.8/32',
+        'jc': 41,
+        'jmin': 19,
+        'jmax': 1229,
+        's1': 108,
+        's2': 91,
+        'h1': 1227055451,
+        'h2': 1909223688,
+        'h3': 1799072513,
+        'h4': 408878865
     },
-    "Peer": {
-        "PublicKey": "uMnvozNSuNG6pRbzL7jViHTECIhEzsD/GxMSvY5lBzM=",
-        "AllowedIPs": ["10.0.0.0/24"],
-        "Endpoint": "194.135.17.31:51000",
-        "PersistentKeepalive": 25,
-    },
-    "config_id": 10,
+    'Peer': {
+        'PublicKey': '0AXljU0Aub0d4CPii7PH/0fdDH2XxSOSAgBWHBanhBI=',
+        'AllowedIPs': ['0.0.0.0/0'],
+        'Endpoint': '87.251.88.16:50281',
+        'PersistentKeepalive': 25,
+    }
 }
 

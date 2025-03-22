@@ -46,7 +46,7 @@ class VPNService:
             await self._session.close()
             self._session = None
 
-    async def create_config(self):
+    async def create_config(self) -> AWgConfigModel:
         """Send a request to vnp-service for creating new config."""
         create_url = f"/api/{self.api_version}/config"
         payload = {'proto': self._config_type}  # sets protocol type
@@ -55,26 +55,24 @@ class VPNService:
                 data = await response.json()
 
                 if response.status not in (200, 201):
-                    # TODO: add logging
-                    # logger.error(f"Failed to fetch config: {response.status} - {await response.text()}")
                     print(f"Error creating a new config. Status:{response.status}, data: {data}")
-                    # raise ConfigCreateError(f"Error creating a new config: {response.status}, {data}")
-                    return None
+                    raise ConfigCreateError(f"Error creating a new config: {response.status}, {data}")
 
                 try:
                     return AWgConfigModel(**data)
                 except ValidationError as ve:
                     print(f"Validation error: {ve.errors()}")  # TODO: add logging
-                    return None
+                    raise ConfigCreateError from ve
 
-        except ClientTimeout:
+        except ClientTimeout as ct:
             print(f"Timeout occurred while trying to reach {create_url}")
+            raise ConfigCreateError from ct
         except (ClientError, ClientResponseError) as e:
             print(f"HTTP error occurred: {e.status} {e.message} when accessing {create_url}")
+            raise ConfigCreateError from e
         except Exception as e:
             print(f"An unexpected error occurred: {str(e)}")
-        finally:
-            return None
+            raise ConfigCreateError from e
 
     def deactivate_config(self):
         pass
@@ -89,15 +87,15 @@ class VPNService:
             "[Interface]\n" +
             f"PrivateKey = {config.Interface.PrivateKey}\n" +
             f"Address = {config.Interface.Address}\n" +
-            f"Jc = {config.Interface.Jc}\n" +
-            f"Jmin = {config.Interface.Jmin}\n" +
-            f"Jmax = {config.Interface.Jmax}\n" +
-            f"S1 = {config.Interface.S1}\n" +
-            f"S2 = {config.Interface.S2}\n" +
-            f"H1 = {config.Interface.H1}\n" +
-            f"H2 = {config.Interface.H2}\n" +
-            f"H3 = {config.Interface.H3}\n" +
-            f"H4 = {config.Interface.H4}\n"
+            f"Jc = {config.Interface.jc}\n" +
+            f"Jmin = {config.Interface.jmin}\n" +
+            f"Jmax = {config.Interface.jmax}\n" +
+            f"S1 = {config.Interface.s1}\n" +
+            f"S2 = {config.Interface.s2}\n" +
+            f"H1 = {config.Interface.h1}\n" +
+            f"H2 = {config.Interface.h2}\n" +
+            f"H3 = {config.Interface.h3}\n" +
+            f"H4 = {config.Interface.h4}\n"
         )
 
         PEER_TMP = (

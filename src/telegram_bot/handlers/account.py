@@ -12,7 +12,7 @@ from django_module.apps.vpn.models import Client, Subscription, PaymentHistory, 
 from telegram_bot.handlers import static_text
 from telegram_bot.handlers.start_command import start_command
 from telegram_bot.utils import notify_admin_users
-from telegram_bot.vpn_service.service import VPNService
+from telegram_bot.vpn_service.service import VPNService, ConfigCreateError
 
 simple_back_keyboard = [
     [
@@ -143,30 +143,31 @@ async def successful_payment_callback(update: Update, context: CallbackContext):
         payment_time=dt.datetime.now(), transaction_id=payment.telegram_payment_charge_id,
         amount=payment.total_amount, subscription=subscription, invoice_payload=payment.invoice_payload,
     )
-    config = await VPNService().create_config()
-    if config is None:
+    try:
+        config = await VPNService().create_config()
+    except ConfigCreateError as ex:
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=(
                 f"Платеж успешно выполнен! В данный момент возникли технические сложности, "
-                f"с вами свяжется специалист поддержки при первой возможности и вышлет конфиг"
+                f"с вами свяжется специалист поддержки при первой возможности и вышлет конфиг."
             )
         )
         await notify_admin_users(
             context, f"Error ⚠️: Клиент {client.username} заплатил,"
-                     f" но не получил конфиг так как VPN сервис оказался недоступен."
+                     f" но не получил конфиг так как VPN сервис оказался недоступен. Лог ошибки: {str(ex)}"
         )
         return
 
     config_file_path = await VPNService.create_file_by_config(config)
-    await Config.objects.acreate(data=config.model_dump(), activated=True, vpn_id=config.config_id, subscription=subscription)
+    await Config.objects.acreate(data=config.model_dump(exclude={"config_id"}), activated=True, vpn_id=config.config_id, subscription=subscription)
     await context.bot.send_document(
         update.effective_user.id,
         caption=f'Это ваш персональный файл конфигурации VPN. Он действует до {subscription.end_date}',
         document=config_file_path,
     )
     os.remove(config_file_path)
-    await update.message.reply_text(f"Спасибо за выбор!")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Спасибо за выбор!")
 
 
 # Set up second level ConversationHandler (account)

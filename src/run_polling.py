@@ -1,14 +1,15 @@
-import asyncio
 import os, django
 
-from telegram_bot.vpn_service.service import VPNService
+from logging_config import tgbot_logger
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_module.django_back_project.settings')
 django.setup()
 
+import asyncio
 from telegram.ext import Application
 from telegram import Update
 
+from telegram_bot.vpn_service.service import VPNService
 from django_module.django_back_project.settings import TELEGRAM_TOKEN
 from telegram_bot.dispatcher import setup_handlers
 
@@ -30,7 +31,7 @@ async def run_polling(tg_token: str = TELEGRAM_TOKEN):
     await application.initialize()
     await application.start()
     await application.updater.start_polling(allowed_updates=Update.ALL_TYPES)
-    print("Bot is running in polling mode...")
+    tgbot_logger.info("Bot is running in polling mode...")
 
     try:
         await asyncio.Event().wait()  # Wait indefinitely until manually stopped
@@ -38,6 +39,7 @@ async def run_polling(tg_token: str = TELEGRAM_TOKEN):
         print("Bot is shutting down...")  # Handle the cancellation gracefully
     finally:
         # Ensure the bot is stopped gracefully
+        await VPNService().close_session()
         await application.stop()
         print("Bot has been stopped.")
 
@@ -46,5 +48,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(run_polling())
     except (KeyboardInterrupt, SystemExit):
-        VPNService().close_session()
         print("Bot process interrupted.")

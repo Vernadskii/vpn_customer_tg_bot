@@ -1,6 +1,4 @@
-import logging
 import os
-import sys
 
 import dj_database_url
 import dotenv
@@ -161,6 +159,37 @@ env_values = ('local', 'test', 'prod')
 ENV = _get_env_variable("ENV")
 if ENV not in env_values:
     raise ImproperlyConfigured(f"ENV variable has invalid value. Choose from {env_values}.")
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s - %(name)s - %(module)s - %(levelname)s - %(message)s',
+            'style': '%',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'level': os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'tg_bot': {
+            'level': os.getenv("APP_LOG_LEVEL", "DEBUG"),
+            'handlers': ['console'],
+            'propagate': False,
+        },
+    },
+}
+
 
 # -----> SENTRY
 # import sentry_sdk

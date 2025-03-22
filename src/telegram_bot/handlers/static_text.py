@@ -31,7 +31,7 @@ BUY_VPN_CALLBACK = "buy_vpn"
 MY_SUBSCRIPTIONS_BUTTON = "Мои подписки 🧮"
 MY_SUBSCRIPTIONS_CALLBACK = "my_subscriptions"
 
-PRICE_1_MONTH = 50
+PRICE_1_MONTH = 1
 BUY_1_MONTH = '1 месяц'
 BUY_1_MONTH_CALLBACK = '1_month_callback'
 PRICE_3_MONTH = 150
