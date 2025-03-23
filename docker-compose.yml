@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile
     container_name: django_app
     restart: always
-    command: bash -c "poetry run python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: bash -c "poetry run python src/manage.py migrate && python src/manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
@@ -32,11 +32,11 @@ services:
       dockerfile: Dockerfile
     container_name: bot_app
     restart: always
-    command: poetry run python run_polling.py
+    command: poetry run python src/run_polling.py
     env_file:
       - ./.env
     depends_on:
-      - web
+      - db
 
 volumes:
   postgres_data:

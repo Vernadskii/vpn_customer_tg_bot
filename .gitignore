@@ -139,3 +139,4 @@ dmypy.json
 
 /data/
 .gitignore
+/.env_local
