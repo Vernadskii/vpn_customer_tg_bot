@@ -57,6 +57,11 @@ async def propose_account(update: Update, context: CallbackContext) -> int:
     except error.BadRequest:  # Message can't be edited when it's invoice
         await context.bot.send_message(
             chat_id=update.callback_query.message.chat.id,
+            text=f"*Не используйте кнопку оплаты в старом сообщении\!*",
+            parse_mode="MarkdownV2",
+        )
+        await context.bot.send_message(
+            chat_id=update.callback_query.message.chat.id,
             text=f"Мои подписки:\n"
                  f"{account_text}",
             reply_markup=InlineKeyboardMarkup(keyboard),
