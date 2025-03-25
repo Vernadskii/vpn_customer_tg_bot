@@ -4,9 +4,9 @@ import os
 from django.utils import timezone
 
 from dateutil.relativedelta import relativedelta
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice, error
 from telegram.ext import (
-    ConversationHandler, CommandHandler, CallbackContext, CallbackQueryHandler, MessageHandler, filters,
+    ConversationHandler, CommandHandler, CallbackContext, CallbackQueryHandler,
 )
 
 import datetime as dt
@@ -48,11 +48,19 @@ async def propose_account(update: Update, context: CallbackContext) -> int:
 
     account_text = await _generate_text_for_account(update.effective_user.to_dict())
 
-    await update.callback_query.edit_message_text(
-        text=f"Мои подписки:\n"
-             f"{account_text}",
-        reply_markup=InlineKeyboardMarkup(keyboard),
-    )
+    try:
+        await update.callback_query.edit_message_text(
+            text=f"Мои подписки:\n"
+                 f"{account_text}",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+        )
+    except error.BadRequest:  # Message can't be edited when it's invoice
+        await context.bot.send_message(
+            chat_id=update.callback_query.message.chat.id,
+            text=f"Мои подписки:\n"
+                 f"{account_text}",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+        )
     return static_text.CHOOSING_ACCOUNT_ACTION
 
 
@@ -103,6 +111,17 @@ async def handle_buy_specific(update: Update, context: CallbackContext):
 
     prices = [LabeledPrice(month_text, price)]
 
+    keyboard = [
+        [
+            InlineKeyboardButton(
+                f"Оплатить {price} ⭐️`", pay=True,
+            ),
+        ],
+        [
+            InlineKeyboardButton(static_text.BACK, callback_data=static_text.BACK_ACCOUNT_CALLBACK),
+        ],
+    ]
+
     await context.bot.send_invoice(
         chat_id=update.callback_query.message.chat.id,
         title=title,
@@ -112,6 +131,7 @@ async def handle_buy_specific(update: Update, context: CallbackContext):
         currency=currency,
         prices=prices,
         start_parameter="start_parameter",
+        reply_markup=InlineKeyboardMarkup(keyboard)
     )
     return static_text.BUYING_STATE
 
@@ -204,7 +224,7 @@ account_conversation = ConversationHandler(
             CallbackQueryHandler(handle_buy_specific, pattern=f"^{static_text.BUY_CALLBACK_PATTERN}$"),
         ],
         static_text.BUYING_STATE: [
-            MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback)
+            CallbackQueryHandler(handle_end_account_level, pattern=f"^{static_text.BACK_CALLBACK}$"),
         ]
     },
     fallbacks=[

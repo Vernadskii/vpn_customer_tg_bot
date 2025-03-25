@@ -11,32 +11,33 @@ services:
       - ./.env
     ports:
       - "5434:5432"
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: django_app
-    restart: always
-    command: bash -c "poetry run python src/manage.py migrate && python src/manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/code
-    ports:
-      - "8000:8000"
-    env_file:
-      - ./.env
-    depends_on:
-      - db
   bot:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: bot_app
     restart: always
-    command: poetry run python src/run_polling.py
+    command: bash -c "poetry run python src/manage.py migrate && poetry run python src/run_polling.py"
     env_file:
       - ./.env
     depends_on:
       - db
+#  web:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: django_app
+#    restart: always
+#    command: bash -c "poetry run python src/manage.py migrate && python src/manage.py runserver 0.0.0.0:8000"
+#    volumes:
+#      - .:/code
+#    ports:
+#      - "8000:8000"
+#    env_file:
+#      - ./.env
+#    depends_on:
+#      - db
+
 
 volumes:
   postgres_data:
