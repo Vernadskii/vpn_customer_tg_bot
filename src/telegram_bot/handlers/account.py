@@ -176,7 +176,6 @@ async def successful_payment_callback(update: Update, context: CallbackContext):
     client, _ = await Client.get_client_or_create(update.effective_user.to_dict())
     subscription = await Subscription.objects.acreate(
         client=client, start_date=dt.date.today(), end_date=dt.date.today()+relativedelta(months=months_amount),
-        amount=months_amount,
     )
     await PaymentHistory.objects.acreate(
         payment_time=timezone.now(), transaction_id=payment.telegram_payment_charge_id,
