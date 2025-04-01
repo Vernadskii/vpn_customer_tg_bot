@@ -6,7 +6,7 @@ from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, LabeledPrice, error
 from telegram.ext import (
-    ConversationHandler, CommandHandler, CallbackContext, CallbackQueryHandler,
+    ConversationHandler, CommandHandler, CallbackContext, CallbackQueryHandler, MessageHandler, filters,
 )
 
 import datetime as dt
@@ -229,6 +229,7 @@ account_conversation = ConversationHandler(
         ],
         static_text.BUYING_STATE: [
             CallbackQueryHandler(handle_end_account_level, pattern=f"^{static_text.BACK_CALLBACK}$"),
+            MessageHandler(filters.SUCCESSFUL_PAYMENT, successful_payment_callback),
         ]
     },
     fallbacks=[
