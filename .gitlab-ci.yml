@@ -1,0 +1,30 @@
+image: docker:latest
+
+variables:
+  IMAGE_NAME: "$CI_REGISTRY/$CI_PROJECT_PATH"
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+build:
+  stage: build
+  script:
+    - docker build -t $IMAGE_NAME:$CI_COMMIT_TAG .  # Используем тег в имени образа
+    - docker push $IMAGE_NAME:$CI_COMMIT_TAG        # Отправляем в GitLab Registry
+  only:
+    - tags  # Запускать только при создании тега
+
+deploy:
+  stage: deploy
+  image: python:3.11
+  before_script:
+    - pip install ansible
+  script:
+    - ansible-playbook -i hosts.yml deploy.yml --extra-vars "docker_tag=$CI_COMMIT_TAG"
+  only:
+    - tags  # Запускать только при создании тега
+  when: manual

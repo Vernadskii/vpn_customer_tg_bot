@@ -1,0 +1,25 @@
+- name: Deploy Docker application
+  hosts: my-vps
+  become: true
+  tasks:
+    - name: Pull the latest Docker image
+      community.docker.docker_image:
+        name: registry.gitlab.com/your-group/your-project
+        tag: latest
+        source: pull
+
+    - name: Stop and remove old container
+      community.docker.docker_container:
+        name: my-app
+        state: absent
+
+    - name: Start the new container
+      community.docker.docker_container:
+        name: my-app
+        image: registry.gitlab.com/your-group/your-project:latest
+        state: started
+        restart_policy: always
+        ports:
+          - "80:80"
+        env:
+          DATABASE_URL: "postgres://your_user:your_pass@your-vps-ip:5432/your_db"
