@@ -7,71 +7,37 @@ services:
     restart: always
     volumes:
       - ./data/postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=tg_bot
-      - POSTGRES_PASSWORD=postgres
     env_file:
       - ./.env
     ports:
-      - "5433:5432"
-  redis:
-    image: redis:alpine
-    container_name: dtb_redis
-  web:
+      - "5434:5432"
+  bot:
     build:
       context: .
-      dockerfile: LocalDockerfile
-    container_name: dtb_django
+      dockerfile: Dockerfile
+    container_name: bot_app
     restart: always
-    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/code
-    ports:
-      - "8000:8000"
+    command: bash -c "poetry run python src/manage.py migrate && poetry run python src/run_polling.py"
     env_file:
       - ./.env
     depends_on:
       - db
-  bot:
-    build:
-      context: .
-      dockerfile: LocalDockerfile
-    container_name: dtb_bot
-    restart: always
-    command: python run_polling.py
-    env_file:
-      - ./.env
-    depends_on:
-      - web
-  celery:
-    build:
-      context: .
-      dockerfile: LocalDockerfile
-    container_name: dtb_celery
-    restart: always
-    command: celery -A dtb worker --loglevel=INFO
-    volumes:
-      - .:/code
-    env_file:
-      - ./.env
-    depends_on:
-      - redis
-      - web
-  celery-beat:
-    build:
-      context: .
-      dockerfile: LocalDockerfile
-    container_name: dtb_beat
-    restart: always
-    command: celery -A dtb beat -l info --scheduler django_celery_beat.schedulers.DatabaseScheduler
-    volumes:
-      - .:/code
-    env_file:
-      - ./.env
-    depends_on:
-      - redis
-      - celery
-      - web
+#  web:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: django_app
+#    restart: always
+#    command: bash -c "poetry run python src/manage.py migrate && python src/manage.py runserver 0.0.0.0:8000"
+#    volumes:
+#      - .:/code
+#    ports:
+#      - "8000:8000"
+#    env_file:
+#      - ./.env
+#    depends_on:
+#      - db
+
 
 volumes:
   postgres_data:
