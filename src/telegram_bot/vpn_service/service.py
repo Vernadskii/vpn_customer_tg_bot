@@ -37,7 +37,7 @@ class VPNService:
                 headers={"X-API-Key": settings.VPN_SERVICE_SECRET_KEY}
             )
 
-    async def close_session(self):  # TODO: add invoking at shutdown
+    async def close_session(self):
         if self._session:
             await self._session.close()
             self._session = None

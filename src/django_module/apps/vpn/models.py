@@ -21,7 +21,7 @@ class Client(CreateUpdateTracker):
     )
     is_admin = models.BooleanField(default=False)
 
-    admins = AdminUserManager()  # User.admins.all()
+    admins = AdminUserManager()
     objects = models.Manager()
 
     def __str__(self):
@@ -58,7 +58,7 @@ class Subscription(models.Model):
     def __str__(self):
         return (
             f'client: @{self.client.id}, '
-            f'start_date: {self.start_date}, end_date: {self.end_date}, amount: {self.amount}',
+            f'start_date: {self.start_date}, end_date: {self.end_date}',
         )
 
 
